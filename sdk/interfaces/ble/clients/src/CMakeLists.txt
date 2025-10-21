@@ -1,0 +1,10 @@
+sdk10_sources_ifdef(CONFIG_USE_BLE
+	bas_client.c
+	ble_client.c
+	cscs_client.c
+	dis_client.c
+	gatt_client.c
+	hids_client.c
+	hrs_client.c
+	scps_client.c
+)

@@ -1,0 +1,14 @@
+sdk10_sources_ifdef(CONFIG_USE_BLE
+	ble_mgr.c
+	ble_mgr_ad_msg.c
+	ble_mgr_cmd.c
+	ble_mgr_common.c
+	ble_mgr_gap.c
+	ble_mgr_gattc.c
+	ble_mgr_gatts.c
+	ble_mgr_gtl.c
+	ble_mgr_helper.c
+	ble_mgr_l2cap.c
+	storage.c
+	storage_flash.c
+)

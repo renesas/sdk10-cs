@@ -1,0 +1,20 @@
+sdk10_sources_ifdef(CONFIG_USE_BLE
+	bas.c
+	bcs.c
+	ble_service.c
+	bls.c
+	bms.c
+	cts.c
+	dis.c
+	dlg_debug.c
+	dlg_suota.c
+	hids.c
+	hrs.c
+	ias.c
+	lls.c
+	scps.c
+	sps.c
+	tps.c
+	uds.c
+	wss.c
+)

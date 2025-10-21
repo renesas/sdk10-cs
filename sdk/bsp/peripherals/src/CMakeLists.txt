@@ -1,0 +1,37 @@
+sdk10_sources(
+	hw_aes.c
+	hw_aes_hash.c
+	hw_cache.c
+	hw_dma.c
+	hw_fcu.c
+	hw_gpadc.c
+	hw_gpadc_v2.c
+	hw_gpio.c
+	hw_hard_fault.c
+	hw_hash.c
+	hw_i2c.c
+	hw_memctrl.c
+	hw_mpu.c
+	hw_pcm.c
+	hw_pdc.c
+	hw_pdm.c
+	hw_qspi_v2.c
+	hw_quad_v2.c
+	hw_rtc.c
+	hw_sdadc.c
+	hw_spi.c
+	hw_src.c
+	hw_timer.c
+	hw_uart.c
+	hw_watchdog.c
+	hw_wkup_v2.c
+)
+
+sdk10_sources_ifdef(DA1459X
+	hw_bod_da1459x.c
+	hw_clk_da1459x.c
+	hw_cpm_da1459x.c
+	hw_pmu_da1459x.c
+	hw_sys_da1459x.c
+)
+

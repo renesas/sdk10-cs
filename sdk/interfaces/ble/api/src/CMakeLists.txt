@@ -1,0 +1,11 @@
+sdk10_sources_ifdef(CONFIG_USE_BLE
+	ble_attribdb.c
+	ble_common.c
+	ble_gap.c
+	ble_gattc.c
+	ble_gattc_util.c
+	ble_gatts.c
+	ble_l2cap.c
+	ble_storage.c
+	ble_uuid.c
+)
