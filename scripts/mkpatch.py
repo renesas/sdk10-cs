@@ -1,6 +1,9 @@
 #!/bin/python3
 
 import re
+from pathlib import Path as DiskPath
+from typing import Union
+from zipfile import is_zipfile, Path as ZipPath
 from jinja2 import Template
 from difflib import unified_diff
 from os import path
@@ -8,7 +11,6 @@ from subprocess import run, PIPE
 from sys import argv, stdout, stderr
 from shutil import which
 from argparse import ArgumentParser
-from dataclasses import dataclass
 from typing import IO
 
 PATCH_LICENSE = f"""\
@@ -36,14 +38,81 @@ THIS NOTICE.IF YOU DO NOT AGREE TO THESE TERMS, YOU ARE NOT PERMITTED TO USE THI
 SOFTWARE.
 """
 
-@dataclass
 class Context:
-	sdk_version: int
-	sdk_target: str
-	sdk_root: str
+	"""
+	Generic "context" struct that Diff and the main() function depend on for
+	application context.
+	"""
+
+	fs: Union[DiskPath, ZipPath]
+
+	sdk_version: int | None = None
+	sdk_target: str | None = None
+
 	patch_root: str
 	output: IO
-	mkpatch_version: str
+
+	SDKROOT_SET = set(('doc', 'sdk', 'projects', 'utilities',))
+
+	def __init__(self, sdk: str):
+		if not path.exists(sdk):
+			raise Exception(f"cannot open `{sdk}'")
+
+		if path.isdir(sdk):
+			self.fs = DiskPath(sdk)
+		elif is_zipfile(sdk):
+			self.fs = ZipPath(sdk)
+		else:
+			raise Exception("cannot read `{sdk}'")
+
+		found = self.find_root()
+		if not found:
+			raise Exception(f"not an SDK10 folder or archive")
+		
+		version_str = self.get_content("doc/VERSION.txt")
+		if version_str is not None:
+			git_tag, self.sdk_target = version_str.split()
+			git_tag = git_tag.replace("sdk10_", "")
+			git_tag = git_tag.replace("bismuth_", "")
+			git_tag = re.sub(r'^10\.\d+\.\d+.', "", git_tag)
+			match = re.search(r'\d+', git_tag)
+			assert match is not None
+			self.sdk_version = int(match.group())
+
+	def find_root(self, root: str = "", maxdepth: int = 3) -> bool:
+		if maxdepth < 0:
+			return False
+		here = self.fs.joinpath(root)
+		ls = list(here.iterdir())
+		ls = [path for path in ls if path != here]
+
+		names = set(path.name for path in ls)
+		if names.issuperset(self.SDKROOT_SET):
+			self.fs = here
+			return True
+
+		for entry in ls:
+			if not entry.is_dir():
+				continue
+			found = self.find_root(path.join(root, entry.name), maxdepth - 1)
+			if found:
+				return found
+		return False
+
+	def get_dir(self, dir: str) -> list[str]:
+		here = self.fs.joinpath(dir)
+		print(here)
+		return [path.name for path in here.iterdir()]
+
+	def get_content(self, file: str) -> str | None:
+		here = self.fs.joinpath(file)
+		if not here.exists():
+			return None
+		return here.read_bytes().decode()
+
+	def validate(self):
+		if self.sdk_version is None:
+			raise ValueError("no SDK version specified or detected")
 
 def parse_arguments() -> Context:
 	parser = ArgumentParser(
@@ -53,7 +122,7 @@ def parse_arguments() -> Context:
 	parser.add_argument(
 		'-v', '--version',
 		help="specify SDK10 version (i.e. 86, 104, 108)",
-		type=str,
+		type=int,
 	)
 	parser.add_argument(
 		'-t', '--target',
@@ -61,8 +130,8 @@ def parse_arguments() -> Context:
 		type=str,
 	)
 	parser.add_argument(
-		'SDKROOT',
-		help="SDK10 root directory",
+		'sdk',
+		help="SDK10 directory or archive",
 	)
 
 	options = parser.parse_args()
@@ -71,45 +140,25 @@ def parse_arguments() -> Context:
 		if which(dependency) is None:
 			parser.error(f"missing dependency: {dependency}")
 
-	if not path.isdir(options.SDKROOT):
-		parser.error(f"not a directory `{options.SDKROOT}'")
-	
-	version_file = path.join(options.SDKROOT, "doc/VERSION.txt")
-	if (options.version is None or options.target is None) and path.isfile(version_file):
-		with open(version_file, "r") as file:
-			version_str = file.read().strip()
-			git_tag, options.target = version_str.split()
-			git_tag = git_tag.replace("sdk10_", "")
-			git_tag = git_tag.replace("bismuth_", "")
-			git_tag = re.sub(r'^10\.\d+\.\d+.', "", git_tag)
-			match = re.search(r'\d+', git_tag)
-			assert match is not None
-			options.version = int(match.group())
-
-	if options.target is None:
-		parser.error("no SDK target specified or detected")
-	if options.version is None:
-		parser.error("no SDK version specified or detected")
-
-	options.target = options.target.upper()
-
 	patch_root_cmd = ("git", "rev-parse", "--show-toplevel",)
 	patch_root_cwd = path.dirname(path.realpath(argv[0]))
 	patch_root_proc = run(patch_root_cmd, stdout=PIPE, cwd=patch_root_cwd)
 	patch_root = patch_root_proc.stdout.decode().strip()
 
-	mkpatch_version_cmd = ("git", "describe", "--always", "--dirty",)
-	mkpatch_version_proc = run(mkpatch_version_cmd, stdout=PIPE, cwd=patch_root)
-	mkpatch_version = mkpatch_version_proc.stdout.decode().strip()
+	try:
+		ctx = Context(options.sdk)
 
-	return Context(
-		sdk_version=options.version,
-		sdk_target=options.target,
-		sdk_root=options.SDKROOT,
-		output=stdout,
-		patch_root=patch_root,
-		mkpatch_version=mkpatch_version,
-	)
+		if options.target is not None:
+			ctx.sdk_target = options.target.upper()
+		if options.version is not None:
+			ctx.sdk_version = options.version
+		ctx.patch_root = patch_root
+
+		ctx.validate()
+
+		return ctx
+	except Exception as e:
+		parser.error(str(e))
 
 class Diff:
 	"""
@@ -121,7 +170,7 @@ class Diff:
 	ctx: Context
 	file: str
 
-	content_a: str = ""
+	content_a: str | None
 	content_b: str = ""
 
 	def __init__(self, ctx: Context, file: str):
@@ -129,12 +178,11 @@ class Diff:
 		self.file = file
 
 	def compare(self):
-		a = self.content_a.splitlines()
+		a = [] if self.content_a is None else self.content_a.splitlines()
+		fromfile = "/dev/null" if self.content_a is None else f"a/{self.file}"
+
 		b = self.content_b.strip().splitlines()
 		b = [line.rstrip() for line in b]
-		fromfile = f"a/{self.file}"
-		if not path.exists(path.join(self.ctx.sdk_root, self.file)):
-			fromfile = "/dev/null"
 		tofile = f"b/{self.file}"
 
 		diff = unified_diff(a, b, fromfile, tofile, n=0, lineterm="")
@@ -151,6 +199,8 @@ class IgnoreDiff(Diff):
 	"""
 
 	def diff(self):
+		if self.content_a is None:
+			self.content_a = ""
 		lines_a = self.content_a.splitlines()
 		lines_b = self.content_b.splitlines()
 
@@ -170,6 +220,11 @@ def get_diff_class(file: str) -> type[Diff]:
 
 def main():
 	ctx = parse_arguments()
+	ctx.output = stdout
+
+	mkpatch_version_cmd = ("git", "describe", "--always", "--dirty",)
+	mkpatch_version_proc = run(mkpatch_version_cmd, stdout=PIPE, cwd=ctx.patch_root)
+	mkpatch_version = mkpatch_version_proc.stdout.decode().strip()
 
 	files_cmd = ("git", "ls-files", "--", "sdk",)
 	files_proc = run(files_cmd, stdout=PIPE, cwd=ctx.patch_root)
@@ -179,7 +234,7 @@ def main():
 		print("no files to patch!", file=stderr)
 		return 0
 
-	ctx.output.write(f"sdk10-cmake mkpatch {ctx.mkpatch_version} for " +\
+	ctx.output.write(f"sdk10-cmake mkpatch {mkpatch_version} for " +\
 		f"{ctx.sdk_target} SDK10 version {ctx.sdk_version}.\n\n")
 	ctx.output.write(f"{PATCH_LICENSE}\n---\n\n")
 
@@ -198,10 +253,7 @@ def main():
 		diff = diff_class(ctx, file)
 
 		# read file A contents
-		path_a = path.join(ctx.sdk_root, real_file)
-		if path.exists(path_a):
-			file_a = open(path_a, 'rb', buffering=0)
-			diff.content_a = file_a.read().decode()
+		diff.content_a = ctx.get_content(real_file)
 	
 		# read file B contents
 		path_b = path.join(ctx.patch_root, real_file)
