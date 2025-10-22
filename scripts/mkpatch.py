@@ -227,7 +227,7 @@ def main():
 	ctx = parse_arguments()
 	ctx.output = stdout
 
-	mkpatch_version_cmd = ("git", "describe", "--always", "--dirty",)
+	mkpatch_version_cmd = ("git", "describe", "--tags", "--always", "--dirty",)
 	mkpatch_version_proc = run(mkpatch_version_cmd, stdout=PIPE, cwd=ctx.patch_root)
 	mkpatch_version = mkpatch_version_proc.stdout.decode().strip()
 
