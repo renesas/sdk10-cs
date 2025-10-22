@@ -1,1 +1,0 @@
-set(SDK10_VERSION {{ SDK_VERSION }})

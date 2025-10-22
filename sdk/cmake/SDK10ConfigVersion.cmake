@@ -1,2 +1,0 @@
-# good enough
-set(PACKAGE_VERSION_COMPATIBLE TRUE)

@@ -1,0 +1,6 @@
+include_guard(GLOBAL)
+
+set(SDK10_VERSION {{ SDK_VERSION }})
+
+set(PACKAGE_VERSION 10.X.X.${SDK10_VERSION})
+

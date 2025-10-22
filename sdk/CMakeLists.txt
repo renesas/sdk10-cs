@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 # variables
-include(cmake/sdk10_module.cmake)
+include(cmake/sdk10-module.cmake)
 
 # compile options
 sdk10_compile_options_ifdef(LLVM

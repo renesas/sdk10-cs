@@ -1,5 +1,7 @@
 include_guard(GLOBAL)
 
+include(sdk10-version)
+
 # default options
 macro(sdk10_def_option name default_value)
 	if (NOT DEFINED ${name}) 
@@ -14,7 +16,6 @@ sdk10_def_option(CONFIG_USE_BLE NO)
 include(interface)
 include(toolchain)
 include(devices)
-include(sdk10_version)
 
 # other build variables
 set(CMAKE_C_STANDARD 11)
