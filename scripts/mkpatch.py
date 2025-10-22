@@ -4,7 +4,7 @@ import re
 from pathlib import Path as DiskPath
 from typing import Union
 from zipfile import is_zipfile, Path as ZipPath
-from jinja2 import Template
+from jinja2 import Environment
 from difflib import unified_diff
 from os import path
 from subprocess import run, PIPE
@@ -37,6 +37,11 @@ SHALL TAKE PRECEDENCE. BY CONTINUING TO USE THIS SOFTWARE, YOU AGREE TO THE TERM
 THIS NOTICE.IF YOU DO NOT AGREE TO THESE TERMS, YOU ARE NOT PERMITTED TO USE THIS
 SOFTWARE.
 """
+
+JINJA_ENV = Environment(
+	trim_blocks=True,
+	lstrip_blocks=True,
+)
 
 class Context:
 	"""
@@ -261,7 +266,7 @@ def main():
 			file_b = open(path_b, 'rb', buffering=0)
 			content_b = file_b.read().decode()
 			if template:
-				content_b = Template(content_b).render(**template_vars)
+				content_b = JINJA_ENV.from_string(content_b).render(**template_vars)
 			diff.content_b = content_b
 		diff.diff()
 	

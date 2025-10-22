@@ -84,7 +84,7 @@ set_target_properties(iidirng PROPERTIES
 # ble stack
 add_library(ble_stack STATIC IMPORTED)
 set_target_properties(ble_stack PROPERTIES
-	IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/interfaces/ble/binaries/${DEVICE}-Release/libble_stack_${LIBBLE_STACK_VER}.a"
+	IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/interfaces/ble/binaries/${LIBBLE_BLOB_LOCATION}"
 )
 
 # linker scripts
