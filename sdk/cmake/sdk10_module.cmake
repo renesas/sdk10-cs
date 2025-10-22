@@ -14,6 +14,7 @@ sdk10_def_option(CONFIG_USE_BLE NO)
 include(interface)
 include(toolchain)
 include(devices)
+include(sdk10_version)
 
 # other build variables
 set(CMAKE_C_STANDARD 11)
