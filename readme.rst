@@ -87,8 +87,10 @@ of the code in this repository is licensed with the MIT-0 license. This choice
 was made so modified copies of SDK10 can be used under the same terms as the
 original proprietary license it is released under.
 
-.. TODO: specify what license the released .diff files fall under (check if
-   these can be released w/o including any SDK10 source code)
+.. note::
+
+   The .patch files under the releases tab *are* licensed under the same license
+   as the SDK10 sources themselves.
 
 Development
 ***********
