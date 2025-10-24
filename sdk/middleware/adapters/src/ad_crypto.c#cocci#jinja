@@ -1,0 +1,17 @@
+{% if SDK_VERSION >= 106 %}
+@@
+// This fixes a subtile bug where the crypto engine user callback pointer is
+// overwritten multiple times, resulting in it becoming equal to the internal
+// callback handler. This causes an infinite recursive loop when the AES
+// operation finishes, crashing the system.
+symbol aes_hash_user_cb,aes_hash_irq_cb,cfg;
+identifier ENGINE;
+@@
+
++if (cfg->engine.ENGINE.callback != aes_hash_irq_cb) {
+	aes_hash_user_cb = cfg->engine.ENGINE.callback;
+	cfg->engine.ENGINE.callback = aes_hash_irq_cb;
++}
+
+{% endif %}
+

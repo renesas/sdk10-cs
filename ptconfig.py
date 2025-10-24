@@ -1,5 +1,6 @@
 import re
 from os import path
+from typing import cast
 from patchtree import Context, ProcessJinja2
 from argparse import ArgumentParser
 
@@ -45,7 +46,7 @@ class SDK10ArgumentParser(ArgumentParser):
 
 class SDK10ProcessJinja2(ProcessJinja2):
 	def get_template_vars(self):
-		context: SDK10Context = self.context
+		context = cast(SDK10Context, self.context)
 		return {
 			"SDK_VERSION": context.sdk_version,
 			"SDK_TARGET": context.sdk_target,
