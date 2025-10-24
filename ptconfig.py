@@ -1,10 +1,11 @@
 import re
 from os import path
 from typing import cast
-from patchtree import Context, ProcessJinja2
+from patchtree import Header, Context, ProcessJinja2
 from argparse import ArgumentParser
+from subprocess import run
 
-PATCH_LICENSE = f"""\
+PATCH_LICENSE = f"""
 Copyright (C) 2025 Renesas Electronics Corporation and/or its affiliates.
 All rights reserved. Confidential Information.
 
@@ -28,6 +29,17 @@ SHALL TAKE PRECEDENCE. BY CONTINUING TO USE THIS SOFTWARE, YOU AGREE TO THE TERM
 THIS NOTICE.IF YOU DO NOT AGREE TO THESE TERMS, YOU ARE NOT PERMITTED TO USE THIS
 SOFTWARE.
 """
+
+class SDK10Header(Header):
+	name = "SDK10 patchtree"
+	license = PATCH_LICENSE
+
+	def write_version_extra(self):
+		version_cmd = ("git", "describe", "--tags", "--always", "--dirty",)
+		version_proc = run(version_cmd, text=True, capture_output=True)
+		version = version_proc.stdout.strip()
+
+		self.context.output.write(f"sdk10-cs version {version}\n")
 
 class SDK10ArgumentParser(ArgumentParser):
 	def __init__(self, *args, **kwargs):
@@ -113,6 +125,5 @@ argument_parser = SDK10ArgumentParser
 processors = {
 	"jinja": SDK10ProcessJinja2,
 }
-
-  # # ctx.output.write(f"{PATCH_LICENSE}\n---\n\n")
+header = SDK10Header
 
