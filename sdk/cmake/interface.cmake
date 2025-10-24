@@ -11,11 +11,11 @@ function(sdk10_link_options)
 endfunction()
 
 function(sdk10_include_directories)
-  target_include_directories(sdk10_interface INTERFACE ${ARGV})
+	target_include_directories(sdk10_interface INTERFACE ${ARGV})
 endfunction()
 
 function(sdk10_compile_definitions)
-  target_compile_definitions(sdk10_interface INTERFACE ${ARGV})
+	target_compile_definitions(sdk10_interface INTERFACE ${ARGV})
 endfunction()
 
 function(sdk10_sources)
@@ -23,7 +23,7 @@ function(sdk10_sources)
 endfunction()
 
 function(sdk10_link_libraries)
-  target_link_libraries(SDK10 PUBLIC ${ARGV})
+	target_link_libraries(SDK10 PUBLIC ${ARGV})
 endfunction()
 
 function(sdk10_compile_options_ifdef var)
@@ -63,10 +63,10 @@ function(sdk10_link_libraries_ifdef var)
 endfunction()
 
 function(sdk10_include_files)
-  foreach(file IN LISTS ARGV)
-    cmake_path(ABSOLUTE_PATH file BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
-    sdk10_compile_options(-include "${file}")
-  endforeach()
+	foreach(file IN LISTS ARGV)
+		cmake_path(ABSOLUTE_PATH file BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+		sdk10_compile_options(-include "${file}")
+	endforeach()
 endfunction()
 
 function(sdk10_get_compile_options output)
