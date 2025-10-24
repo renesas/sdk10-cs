@@ -11,4 +11,3 @@ sdk10_sources(
 )
 
 add_subdirectory(portable)
-

@@ -8,4 +8,3 @@ sdk10_sources(
 	port.c
 	portasm.c
 )
-

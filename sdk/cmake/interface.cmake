@@ -99,4 +99,3 @@ function(sdk10_get_compiler_flags output)
 
 	set(${output} ${compile_options} ${compile_definitions} ${include_directories} PARENT_SCOPE)
 endfunction()
-

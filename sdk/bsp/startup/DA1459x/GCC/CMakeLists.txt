@@ -4,4 +4,3 @@ sdk10_sources(
 	startup_da1459x.S
 	vector_table_da1459x.S
 )
-

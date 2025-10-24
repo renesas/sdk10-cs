@@ -3,4 +3,3 @@ list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 include(sdk10-module NO_POLICY_SCOPE)
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/.." SDK10)
-

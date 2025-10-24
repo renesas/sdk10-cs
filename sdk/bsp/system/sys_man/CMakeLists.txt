@@ -22,4 +22,3 @@ sdk10_sources_ifdef(DA1459X
 	sys_power_mgr_da1459x.c
 	sys_tcs_da1459x.c
 )
-

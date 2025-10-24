@@ -132,4 +132,3 @@ target_include_directories("${KERNEL_NAME}" PRIVATE "${include_directories}")
 
 sdk10_get_link_options(link_options)
 target_link_options("${KERNEL_NAME}" PRIVATE "${link_options}" "${compile_options}")
-

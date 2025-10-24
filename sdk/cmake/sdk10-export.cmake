@@ -11,4 +11,3 @@ if(WIN32)
 else()
 	file(WRITE "$ENV{HOME}/.cmake/packages/${PACKAGE_NAME}/${PACKAGE_VERSION}" "${CMAKE_CURRENT_LIST_DIR}")
 endif()
-

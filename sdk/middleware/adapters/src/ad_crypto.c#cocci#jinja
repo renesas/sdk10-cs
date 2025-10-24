@@ -1,6 +1,6 @@
 {% if SDK_VERSION >= 106 %}
 @@
-// This fixes a subtile bug where the crypto engine user callback pointer is
+// This fixes a subtle bug where the crypto engine user callback pointer is
 // overwritten multiple times, resulting in it becoming equal to the internal
 // callback handler. This causes an infinite recursive loop when the AES
 // operation finishes, crashing the system.
@@ -14,4 +14,3 @@ identifier ENGINE;
 +}
 
 {% endif %}
-

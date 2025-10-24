@@ -34,4 +34,3 @@ sdk10_sources_ifdef(DA1459X
 	hw_pmu_da1459x.c
 	hw_sys_da1459x.c
 )
-

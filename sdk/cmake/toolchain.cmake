@@ -84,7 +84,7 @@ endif()
 
 sdk10_detect_compiler_id()
 
-# copmiler type variables
+# compiler type variables
 if (COMPILER_ID STREQUAL "GNU")
 	set(GNU 1)
 elseif(COMPILER_ID STREQUAL "Clang")
@@ -126,4 +126,3 @@ elseif(LLVM)
 	find_program(CMAKE_STRIP        "llvm-strip"   ${FIND_ARGS})
 	find_program(CMAKE_SIZE         "llvm-size"    ${FIND_ARGS})
 endif()
-

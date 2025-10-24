@@ -15,4 +15,3 @@ sdk10_sources(
 	ad_uart.c
 	sys_platform_devices_internal.c
 )
-

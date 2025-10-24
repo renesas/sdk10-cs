@@ -8,4 +8,3 @@ all: build/da1459x-sdk10.1.2.86.patch
 
 %.sha1: %
 	sha1sum $< > $@
-

@@ -22,4 +22,3 @@ if("${DEVICE}" MATCHES "^DA1459[24]$")
 endif()
 
 message(FATAL_ERROR "DEVICE `${DEVICE}' is not supported!")
-
