@@ -1,6 +1,6 @@
 include_guard(GLOBAL)
 
-if (NOT DEVICE) 
+if (NOT DEVICE)
 	message(FATAL_ERROR "No DEVICE configured!")
 endif()
 

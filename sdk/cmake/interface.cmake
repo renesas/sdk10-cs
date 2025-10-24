@@ -93,7 +93,7 @@ function(sdk10_get_compiler_flags output)
 	sdk10_get_compile_options(compile_options)
 	sdk10_get_compile_definitions(compile_definitions)
 	sdk10_get_include_directories(include_directories)
-	
+
 	list(TRANSFORM compile_definitions PREPEND "-D")
 	list(TRANSFORM include_directories PREPEND "-I")
 

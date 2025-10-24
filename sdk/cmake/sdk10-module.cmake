@@ -4,7 +4,7 @@ include(sdk10-version)
 
 # default options
 macro(sdk10_def_option name default_value)
-	if (NOT DEFINED ${name}) 
+	if (NOT DEFINED ${name})
 		set(${name} ${default_value})
 	endif()
 endmacro()
