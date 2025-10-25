@@ -4,6 +4,7 @@ from typing import cast
 from patchtree import Header, Context, ProcessJinja2
 from argparse import ArgumentParser
 from subprocess import run
+from stat import S_ISDIR
 
 PATCH_LICENSE = f"""
 Copyright (C) 2025 Renesas Electronics Corporation and/or its affiliates.
@@ -40,7 +41,8 @@ class SDK10Header(Header):
 		version_proc = run(version_cmd, text=True, capture_output=True)
 		version = version_proc.stdout.strip()
 
-		self.context.output.write(f"sdk10-cs version {version}\n")
+		context = cast(SDK10Context, self.context)
+		self.context.output.write(f"sdk10-cs version {version} for SDK10 version {context.sdk_version}\n")
 
 class SDK10ArgumentParser(ArgumentParser):
 	def __init__(self, *args, **kwargs):
@@ -75,6 +77,7 @@ class SDK10Context(Context):
 	sdk_version: int | None = None
 	sdk_target: str | None = None
 
+	sdkroot: str = ""
 	SDKROOT_SET = set(('doc', 'sdk', 'projects', 'utilities',))
 
 	def __init__(self, options):
@@ -102,22 +105,27 @@ class SDK10Context(Context):
 		if self.sdk_version is None:
 			raise ValueError("no SDK version specified or detected")
 
+	def get_content(self, file: str) -> str | None:
+		return super(SDK10Context, self).get_content(path.join(self.sdkroot, file))
+
+	def get_mode(self, file: str) -> int:
+		return super(SDK10Context, self).get_mode(path.join(self.sdkroot, file))
+
 	def find_root(self, root: str = "", maxdepth: int = 3) -> bool:
 		if maxdepth < 0:
 			return False
-		here = self.fs.joinpath(root)
-		ls = list(here.iterdir())
-		ls = [path for path in ls if path != here]
 
-		names = set(path.name for path in ls)
+		names = set(self.get_dir(root))
+
 		if names.issuperset(self.SDKROOT_SET):
-			self.fs = here
+			self.sdkroot = root
 			return True
 
-		for entry in ls:
-			if not entry.is_dir():
+		for name in names:
+			mode = self.get_mode(path.join(root, name))
+			if not S_ISDIR(mode):
 				continue
-			found = self.find_root(path.join(root, entry.name), maxdepth - 1)
+			found = self.find_root(path.join(root, name), maxdepth - 1)
 			if found:
 				return found
 		return False
