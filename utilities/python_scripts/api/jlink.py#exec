@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fix invalid escape sequence
+exec ruff check --silent --fix --select W605 -

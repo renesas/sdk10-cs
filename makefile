@@ -4,6 +4,7 @@ all: build/da1459x-sdk10.1.2.86.patch
 
 SRCS += 'sdk/**'
 SRCS += 'binaries/**'
+SRCS += 'utilities/**'
 
 %.patch: %.zip
 	sha1sum --quiet --check $<.sha1
