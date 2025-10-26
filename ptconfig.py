@@ -80,8 +80,8 @@ class SDK10Context(Context):
 	sdkroot: str = ""
 	SDKROOT_SET = set(('doc', 'sdk', 'projects', 'utilities',))
 
-	def __init__(self, options):
-		super(SDK10Context, self).__init__(options)
+	def __init__(self, *args, **kwargs):
+		super(SDK10Context, self).__init__(*args, **kwargs)
 
 		found = self.find_root()
 		if not found:
@@ -97,10 +97,10 @@ class SDK10Context(Context):
 			assert match is not None
 			self.sdk_version = int(match.group())
 
-		if options.sdk_target is not None:
-			context.sdk_target = options.sdk_target.upper()
-		if options.sdk_version is not None:
-			context.sdk_version = options.sdk_version
+		if self.options.sdk_target is not None:
+			context.sdk_target = self.options.sdk_target.upper()
+		if self.options.sdk_version is not None:
+			context.sdk_version = self.options.sdk_version
 
 		if self.sdk_version is None:
 			raise ValueError("no SDK version specified or detected")
@@ -137,3 +137,4 @@ processors = {
 }
 header = SDK10Header
 diff_context = 0
+output_shebang = True
