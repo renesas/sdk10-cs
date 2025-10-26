@@ -136,3 +136,4 @@ processors = {
 	"jinja": SDK10ProcessJinja2,
 }
 header = SDK10Header
+diff_context = 0
