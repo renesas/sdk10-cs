@@ -138,3 +138,9 @@ processors = {
 header = SDK10Header
 diff_context = 0
 output_shebang = True
+default_patch_sources = [
+	"sdk/**",
+	"binaries/**",
+	"utilities/**",
+]
+
