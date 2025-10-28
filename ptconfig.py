@@ -51,11 +51,13 @@ class SDK10ArgumentParser(ArgumentParser):
 		extras = self.add_argument_group('SDK10 options')
 		extras.add_argument(
 			'--sdk-version',
+			metavar="VERSION",
 			help="specify SDK version (i.e. 86, 104, 108)",
 			type=int,
 		)
 		extras.add_argument(
 			'--sdk-target',
+			metavar="TARGET",
 			help="specify device target (i.e. DA1459X)",
 			type=str,
 		)
@@ -80,8 +82,8 @@ class SDK10Context(Context):
 	sdkroot: str = ""
 	SDKROOT_SET = set(('doc', 'sdk', 'projects', 'utilities',))
 
-	def __init__(self, *args, **kwargs):
-		super(SDK10Context, self).__init__(*args, **kwargs)
+	def __init__(self, config, options):
+		super(SDK10Context, self).__init__(config, options)
 
 		found = self.find_root()
 		if not found:
@@ -97,10 +99,10 @@ class SDK10Context(Context):
 			assert match is not None
 			self.sdk_version = int(match.group())
 
-		if self.options.sdk_target is not None:
-			context.sdk_target = self.options.sdk_target.upper()
-		if self.options.sdk_version is not None:
-			context.sdk_version = self.options.sdk_version
+		if options.sdk_target is not None:
+			context.sdk_target = options.sdk_target.upper()
+		if options.sdk_version is not None:
+			context.sdk_version = options.sdk_version
 
 		if self.sdk_version is None:
 			raise ValueError("no SDK version specified or detected")
@@ -138,9 +140,4 @@ processors = {
 header = SDK10Header
 diff_context = 0
 output_shebang = True
-default_patch_sources = [
-	"sdk/**",
-	"binaries/**",
-	"utilities/**",
-]
 

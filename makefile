@@ -4,7 +4,7 @@ all: build/da1459x-sdk10.1.2.86.patch
 
 %.patch: %.zip
 	sha1sum --quiet --check $<.sha1
-	patchtree --out $@ $<
+	patchtree --out $@ -C contrib $<
 
 %.sha1: %
 	sha1sum $< > $@
