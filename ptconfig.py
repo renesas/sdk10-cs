@@ -65,10 +65,17 @@ class SDK10ArgumentParser(ArgumentParser):
 class SDK10ProcessJinja2(ProcessJinja2):
 	def get_template_vars(self):
 		context = cast(SDK10Context, self.context)
-		return {
-			"SDK_VERSION": context.sdk_version,
-			"SDK_TARGET": context.sdk_target,
+		vars = {
+			"VERSION": context.sdk_version,
+			"TARGET": context.sdk_target,
 		}
+
+		TARGETS = ("DA1459X", "DA1469X", "DA1470X",)
+		if context.sdk_target is not None:
+			target = context.sdk_target.upper()
+			if target in TARGETS:
+				vars[target] = True
+		return vars
 
 class SDK10Context(Context):
 	"""
@@ -100,7 +107,7 @@ class SDK10Context(Context):
 			self.sdk_version = int(match.group())
 
 		if options.sdk_target is not None:
-			context.sdk_target = options.sdk_target.upper()
+			context.sdk_target = options.sdk_target
 		if options.sdk_version is not None:
 			context.sdk_version = options.sdk_version
 
@@ -140,4 +147,5 @@ processors = {
 header = SDK10Header
 diff_context = 0
 output_shebang = True
+default_root = "contrib"
 

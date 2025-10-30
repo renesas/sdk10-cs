@@ -1,4 +1,4 @@
-{% if SDK_VERSION >= 106 %}
+{% if DA1459X and VERSION >= 106 %}
 @@
 // This fixes a subtle bug where the crypto engine user callback pointer is
 // overwritten multiple times, resulting in it becoming equal to the internal

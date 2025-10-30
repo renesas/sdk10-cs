@@ -1,3 +1,4 @@
+###################
 SDK10 CMake package
 ###################
 
@@ -9,6 +10,7 @@ code that would normally be built and flashed as part of an e² studio project.
    :depth: 1
    :local:
 
+************
 Installation
 ************
 
@@ -31,6 +33,7 @@ The installation procedure consists of the following steps:
 * Install the CMake package by running ``cmake -P
   /dir/to/sdk10/sdk/cmake/sdk10_export.cmake``
 
+*****
 Usage
 *****
 
@@ -49,6 +52,7 @@ required by the SDK10 CMake package.
 
 .. _options:
 
+*******
 Options
 *******
 
@@ -79,6 +83,7 @@ listed below.
 ``CONFIG_USE_BLE``
   Enable BLE support (boolean). Off by default (must mirror C macro equivalent).
 
+*******
 License
 *******
 
@@ -92,6 +97,7 @@ original proprietary license it is released under.
    The .patch files under the releases tab *are* licensed under the same license
    as the SDK10 sources themselves.
 
+***********
 Development
 ***********
 
