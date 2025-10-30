@@ -77,8 +77,12 @@ listed below.
   available in ``$PATH``.
 
 ``SDK10_INCLUDE_FILES``
-  List of file(s) included for ALL sources (including SDK10 sources). Optional,
-  but likely required to build most projects (i.e. ``custom_config_eflash.h``).
+  List of file(s) included for SDK sources. Optional, but likely required to
+  build most projects (i.e. ``custom_config_eflash.h``).
+
+``SDK10_INCLUDE_DIRECTORIES``
+  List of directories to add to the SDK10 sources' include path. Optional, but
+  required for some projects (i.e. ``app_nvparam.h``).
 
 ``CONFIG_USE_BLE``
   Enable BLE support (boolean). Off by default (must mirror C macro equivalent).

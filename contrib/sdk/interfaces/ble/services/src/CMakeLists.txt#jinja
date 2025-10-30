@@ -4,6 +4,9 @@ sdk10_sources_ifdef(CONFIG_USE_BLE
 	ble_service.c
 	bls.c
 	bms.c
+	{% if DA1459X and VERSION >= 86 %}
+	ctes.c
+	{% endif %}
 	cts.c
 	dis.c
 	dlg_debug.c

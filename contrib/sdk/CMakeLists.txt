@@ -28,6 +28,10 @@ sdk10_link_options_ifdef(GCC
 	--specs=nosys.specs
 )
 sdk10_include_files("${SDK10_INCLUDE_FILES}")
+foreach(dir IN LISTS SDK10_INCLUDE_DIRECTORIES)
+	cmake_path(ABSOLUTE_PATH dir BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+	sdk10_include_directories("${dir}")
+endforeach()
 sdk10_compile_definitions(dg_configBUILD_FOR_PROCESSOR=${BUILD_PROCESSOR})
 
 # project
