@@ -1,9 +1,6 @@
 {% if DA1459X and VERSION >= 106 %}
 @@
-// This fixes a subtle bug where the crypto engine user callback pointer is
-// overwritten multiple times, resulting in it becoming equal to the internal
-// callback handler. This causes an infinite recursive loop when the AES
-// operation finishes, crashing the system.
+// See </doc/kll.rst#sdk10cs-crypto-cb>
 symbol aes_hash_user_cb,aes_hash_irq_cb,cfg;
 identifier ENGINE;
 @@
