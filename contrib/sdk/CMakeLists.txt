@@ -13,7 +13,7 @@ sdk10_compile_options(
 	-mthumb
 	-mfloat-abi=hard
 	-mfpu=fpv5-sp-d16
-	-Og
+	-Os
 	-fmessage-length=0
 	-fsigned-char
 	-ffunction-sections

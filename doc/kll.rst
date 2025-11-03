@@ -54,7 +54,7 @@ SDK10CS-UTIL-MODE
   . Please build mkimage and try again.
 
 :Root cause:
-  Some releases of SDK10 appear to be packaged on Windows, while others appear to be packaged on UNIX(-like) systems.
+  Some releases of SDK10 were packaged on Windows, while others were packaged on UNIX(-like) systems.
   The .zip files packaged on Windows do not preserve the executable permissions of the binaries.
 :Resolution:
   The modes of the binaries bundled with the SDK are set to 755 (executable) for \*NIX filesystems.

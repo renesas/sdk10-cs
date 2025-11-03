@@ -9,7 +9,7 @@ SDK10 CMake package
 ###################
 
 This repository contains source files and patches to make SDK10 an installable CMake package.
-It allows you use CMake (or any IDE that uses CMake) together with ezFlashCLI for building and flashing code instead of SmartSnippets studio or |E2S|.
+It allows you use CMake together with ezFlashCLI for building and flashing code instead of SmartSnippets studio or |E2S|.
 
 *************
 Prerequisites
@@ -31,7 +31,12 @@ The CMake package can be installed by running
 
   $ cmake -P /dir/to/sdk10/sdk/cmake/sdk10-export.cmake
 
-After installing, SDK10 CMake projects should build like normal.
+After installing, SDK10 CMake projects should build like any other CMake project.
+
+.. note::
+
+   At this point, any IDE with CMake support can be used to build SDK10 projects, including Visual Studio Code with the CMake extension.
+   Make sure to set the toolchain detection to unspecified so the SDK10 toolchain detection script is used instead of CMake's built-in mechanism.
 
 *****
 Usage

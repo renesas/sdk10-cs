@@ -12,9 +12,16 @@ This repository contains a [patchtree] patchset with bugfixes and additional fea
 
 ## Installation
 
-1. Download the .patch file corresponding to your SDK10 version from the [releases](releases/).
-2. Place the downloaded `.patch` file in the SDKROOT directory (the one that contains `binaries`, `config`, `doc`, `projects`, `sdk` and `utilities` subdirectories) under the name `.patchtree.diff`.
-3. Open a terminal in the SDKROOT directory and run `git apply --unidiff-zero .patchtree.diff`.
+1. Download the .patch file corresponding to your SDK10 version from the [releases](releases/)
+2. Place the downloaded `.patch` file in the SDKROOT directory (the one that contains `binaries`, `config`, `doc`, `projects`, `sdk` and `utilities` subdirectories)
+3. Rename the patch file to `.patchtree.diff`
+4. Open a terminal in the SDKROOT directory and run
+   ```
+   git apply --unidiff-zero .patchtree.diff
+   ```
+
+See the [patchtree user manual][pt-user] for upgrading/removal instructions.
+Make sure to add the `--unidiff-zero` flag when using these instructions.
 
 ## Roadmap
 
@@ -22,6 +29,7 @@ The following functionality is not yet implemented or tested
 
 - DA1469X SDK10 support
 - DA1470X SDK10 support
+- Support `OS_BAREMETAL`
 
 ## License
 
@@ -40,4 +48,5 @@ This patchset makes use of Coccinelle patches, so it must be installed in order 
 Contributions to this repository are actively welcomed.
 Please see the [patchtree developer documentation][pt-dev] for more info on developing patchsets.
 
+[pt-user]: https://patchtree.readthedocs.io/en/latest/user/index.html
 [pt-dev]: https://patchtree.readthedocs.io/en/latest/dev/index.html
