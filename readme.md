@@ -2,6 +2,11 @@
 
 This repository contains a [patchtree] patchset with bugfixes and additional features for SDK10.
 
+> [!IMPORTANT]
+>
+> The patches in this repository are currently only tested with SDK10.1 (DA1459X).
+> See the [roadmap](#roadmap) for planned features.
+
 [patchtree]: https://github.com/renesas/patchtree
 [git]: https://git-scm.com/install
 
