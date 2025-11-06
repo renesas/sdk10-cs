@@ -86,3 +86,7 @@ SDK10 specific variables can be set in the project CMakeLists.txt *before* impor
 ``CONFIG_USE_BLE`` (boolean)
   Enable BLE support (must mirror C macro equivalent).
   Off by default.
+
+``SDK10_NVPARAM_CONFIG_DIR`` (path list)
+  List of directories used to find ``app_nvparam.h`` and ``app_nvparam_values.h``.
+  The default NVPARAM values will be used if this list is not provided.

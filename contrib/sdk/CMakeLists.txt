@@ -34,6 +34,14 @@ foreach(dir IN LISTS SDK10_INCLUDE_DIRECTORIES)
 endforeach()
 sdk10_compile_definitions(dg_configBUILD_FOR_PROCESSOR=${BUILD_PROCESSOR})
 
+foreach(dir IN LISTS SDK10_NVPARAM_CONFIG_DIR)
+	cmake_path(ABSOLUTE_PATH dir BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+	list(APPEND SDK10_NVPARAM_CONFIG_DIRS "${dir}")
+endforeach()
+list(APPEND SDK10_NVPARAM_CONFIG_DIRS
+	"${CMAKE_CURRENT_LIST_DIR}/middleware/adapters/include"
+)
+
 # project
 project(SDK10 VERSION 10.1.6.108 LANGUAGES C ASM)
 
@@ -70,6 +78,22 @@ add_custom_command(
 	COMMAND "${CMAKE_SIZE}" "${KERNEL_NAME}${CMAKE_EXECUTABLE_SUFFIX}"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	USES_TERMINAL
+	VERBATIM
+)
+
+# create_nvparam
+add_custom_target(
+	nvparam
+	DEPENDS "${NVPARAM_BIN_NAME}"
+)
+add_custom_command(
+	OUTPUT "${NVPARAM_BIN_NAME}"
+	COMMAND
+		"${CMAKE_CURRENT_LIST_DIR}/../utilities/python_scripts/qspi/create_nvparam.py"
+		--arm_gcc_path "${TOOLCHAIN_HOME}/bin"
+		"${CMAKE_CURRENT_BINARY_DIR}"
+		${SDK10_NVPARAM_CONFIG_DIRS}
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	VERBATIM
 )
 

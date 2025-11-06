@@ -25,7 +25,14 @@ if (CONFIG_USE_BLE)
 else()
 	set(PROJECT_TYPE non_ble)
 endif()
+
+# binary names
 set(KERNEL_NAME "sdk10")
 set(KERNEL_ELF_NAME "${KERNEL_NAME}.elf")
 set(KERNEL_BIN_NAME "${KERNEL_NAME}.bin")
 set(KERNEL_MAP_NAME "${KERNEL_NAME}.map")
+
+# create_nvparam.py
+set(NVPARAM_SYMBOLS_NAME "nvparam-symbols.o")
+set(NVPARAM_ELF_NAME "nvparam.elf")
+set(NVPARAM_BIN_NAME "nvparam.bin")
