@@ -103,18 +103,6 @@ add_subdirectory(free_rtos)
 add_subdirectory(interfaces)
 add_subdirectory(middleware)
 
-# iidirng
-add_library(iidirng STATIC IMPORTED)
-set_target_properties(iidirng PROPERTIES
-	IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/middleware/intrinsic/lib/libiidirng.a"
-)
-
-# ble stack
-add_library(ble_stack STATIC IMPORTED)
-set_target_properties(ble_stack PROPERTIES
-	IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/interfaces/ble/binaries/${LIBBLE_BLOB_LOCATION}"
-)
-
 # linker scripts
 set(LDSCRIPT_PATH "${CMAKE_CURRENT_LIST_DIR}/bsp/ldscripts/${PROJECT_TYPE}_projects")
 sdk10_get_compiler_flags(compiler_flags)
@@ -136,10 +124,6 @@ foreach(script IN ITEMS mem sections)
 	sdk10_link_options("-T${script}.ld")
 endforeach()
 
-sdk10_link_libraries_ifdef(CONFIG_USE_BLE
-	iidirng
-	ble_stack
-)
 target_link_libraries(app PUBLIC SDK10)
 target_link_libraries("${KERNEL_NAME}" PUBLIC app)
 

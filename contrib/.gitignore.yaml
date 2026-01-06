@@ -1,0 +1,6 @@
+!patchspec
+processors:
+  - id: merge
+    strategy: ignore
+    input: |
+      build/

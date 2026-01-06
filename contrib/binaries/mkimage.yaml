@@ -1,0 +1,5 @@
+!patchspec
+processors:
+  - id: touch
+    input: !target mkimage
+    mode: 0755

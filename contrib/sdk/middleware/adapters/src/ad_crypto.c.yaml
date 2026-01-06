@@ -1,0 +1,5 @@
+!patchspec
+processors:
+  - id: jinja
+    input: !input ad_crypto.cocci.jinja
+  - id: cocci

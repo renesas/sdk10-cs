@@ -1,0 +1,102 @@
+configurations:
+  DA1459X_86:
+    version: 10.1.2.86
+    devices: [DA14592]
+  DA1459X_104:
+    version: 10.1.4.104
+    devices: [DA14592, DA14594]
+  DA1459X_108:
+    version: 10.1.6.108
+    devices: [DA14592, DA14594]
+  DA1469X_105:
+    version: 10.0.8.105
+  DA1469X_119:
+    version: 10.0.10.119.1
+  DA1469X_146_0:
+    version: 10.0.12.146
+  DA1469X_146_1:
+    version: 10.0.12.146.1
+  DA1469X_146_2:
+    version: 10.0.12.146.2
+  DA1469X_146_3:
+    version: 10.0.12.146.3
+  DA1469X_153:
+    version: 10.0.16.153
+
+groups:
+  DA1459X:
+    - DA1459X_86
+    - DA1459X_104
+    - DA1459X_108
+  DA1469X:
+    - DA1469X_105
+    - DA1469X_119
+    - DA1469X_146_0
+    - DA1469X_146_1
+    - DA1469X_146_2
+    - DA1469X_146_3
+    - DA1469X_153
+
+tests:
+  - path: projects/dk_apps/ble_profiles/ams
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/ancs
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/blp_sensor
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/bms
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/cscp_collector
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/ctes
+    configurations: [DA1459X_104, DA1459X_108]
+  - path: projects/dk_apps/ble_profiles/hogp_device
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/hogp_host
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/hrp_collector
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/hrp_sensor
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/ble_profiles/wsp_weightscale
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/cppcheck/crash_dummy
+    configurations: [DA1469X]
+  - path: projects/dk_apps/demos/apu_demo
+    configurations: [DA1469X]
+  - path: projects/dk_apps/demos/audio_demo
+    configurations: [DA1459X]
+  - path: projects/dk_apps/demos/ble_adv
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/demos/ble_cli
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/demos/ble_external_host
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/demos/ble_multi_link
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/demos/pxp_reporter
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/features/asymmetric_suota
+    configurations: [DA1459X_104, DA1459X_108]
+  - path: projects/dk_apps/features/ble_central
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/features/ble_peripheral
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/features/ble_suota_client
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/features/erm
+    configurations: [DA1469X]
+  - path: projects/dk_apps/features/lra
+    configurations: [DA1469X]
+  - path: projects/dk_apps/features/snc_gpadc_demo
+    configurations: [DA1469X]
+  - path: projects/dk_apps/features/snc_test
+    configurations: [DA1469X]
+  - path: projects/dk_apps/features/usb_cdc
+    configurations: [DA1469X]
+  - path: projects/dk_apps/features/usb_cdc_vmsd
+    configurations: [DA1469X]
+  - path: projects/dk_apps/reference_designs/st_fw
+    configurations: [DA1459X, DA1469X]
+  - path: projects/dk_apps/templates/freertos_retarget
+    configurations: [DA1459X, DA1469X]

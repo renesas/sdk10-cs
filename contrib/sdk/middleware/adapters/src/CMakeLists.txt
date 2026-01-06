@@ -15,3 +15,11 @@ sdk10_sources(
 	ad_uart.c
 	sys_platform_devices_internal.c
 )
+
+sdk10_sources_ifdef(DA1469X
+	ad_haptic.c
+	ad_iso7816.c
+	ad_keyboard_scanner.c
+	ad_lcdc.c
+	ad_snc.c
+)

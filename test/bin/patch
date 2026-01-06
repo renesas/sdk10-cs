@@ -1,0 +1,8 @@
+#!/bin/sh
+OUTPUT_DIR="$(readlink -f "$1")"
+cd "$(dirname "$(readlink -f "$0")")"
+cd "$(git rev-parse --show-toplevel)"
+
+for sdk in "$OUTPUT_DIR"/* ; do
+	patchtree --in-place "$sdk"
+done

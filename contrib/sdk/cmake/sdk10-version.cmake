@@ -1,5 +1,7 @@
-include_guard(GLOBAL)
-
+--- !patchspec
+processors:
+  - id: jinja
+...
 set(SDK10_VERSION {{ VERSION }})
 set(SDK10_TARGET {{ TARGET }})
 

@@ -1,0 +1,5 @@
+!patchspec
+processors:
+  - id: touch
+    input: !target cli_programmer
+    mode: 0755

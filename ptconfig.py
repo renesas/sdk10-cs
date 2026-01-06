@@ -1,10 +1,13 @@
 import re
 from os import path
+from pathlib import Path
 from typing import cast
-from patchtree import Header, Context, ProcessJinja2
+from patchtree import Header, Context, Jinja2Process
 from argparse import ArgumentParser
 from subprocess import run
 from stat import S_ISDIR
+
+from patchtree.target import TargetFileInputSpec
 
 PATCH_LICENSE = f"""
 Copyright (C) 2025 Renesas Electronics Corporation and/or its affiliates.
@@ -42,7 +45,7 @@ class SDK10Header(Header):
 		version = version_proc.stdout.strip()
 
 		context = cast(SDK10Context, self.context)
-		self.context.output.write(f"sdk10-cs version {version} for SDK10 version {context.sdk_version}\n")
+		return f"sdk10-cs version {version} for SDK10 version {context.sdk_version}\n"
 
 class SDK10ArgumentParser(ArgumentParser):
 	def __init__(self, *args, **kwargs):
@@ -62,9 +65,9 @@ class SDK10ArgumentParser(ArgumentParser):
 			type=str,
 		)
 
-class SDK10ProcessJinja2(ProcessJinja2):
+class SDK10Jinja2Process(Jinja2Process):
 	def get_template_vars(self):
-		context = cast(SDK10Context, self.context)
+		context = cast(SDK10Context, self.target.context)
 		vars = {
 			"VERSION": context.sdk_version,
 			"TARGET": context.sdk_target,
@@ -86,7 +89,6 @@ class SDK10Context(Context):
 	sdk_version: int | None = None
 	sdk_target: str | None = None
 
-	sdkroot: str = ""
 	SDKROOT_SET = set(('doc', 'sdk', 'projects', 'utilities',))
 
 	def __init__(self, config, options):
@@ -96,7 +98,8 @@ class SDK10Context(Context):
 		if not found:
 			raise Exception(f"not an SDK10 folder or archive")
 
-		version_str = self.get_content("doc/VERSION.txt")
+		version = self.get_file(TargetFileInputSpec(path=Path("doc/VERSION.txt")))
+		version_str = version.get_str()
 		if version_str is not None:
 			git_tag, self.sdk_target = version_str.split()
 			git_tag = git_tag.replace("sdk10_", "")
@@ -114,27 +117,21 @@ class SDK10Context(Context):
 		if self.sdk_version is None:
 			raise ValueError("no SDK version specified or detected")
 
-	def get_content(self, file: str) -> str | None:
-		return super(SDK10Context, self).get_content(path.join(self.sdkroot, file))
-
-	def get_mode(self, file: str) -> int:
-		return super(SDK10Context, self).get_mode(path.join(self.sdkroot, file))
-
-	def find_root(self, root: str = "", maxdepth: int = 3) -> bool:
+	def find_root(self, root: Path = Path(), maxdepth: int = 3) -> bool:
 		if maxdepth < 0:
 			return False
 
-		names = set(self.get_dir(root))
+		names = set(path.name for path in self.target_fs.get_dir(root))
 
 		if names.issuperset(self.SDKROOT_SET):
-			self.sdkroot = root
+			self.target_fs.root = root
 			return True
 
 		for name in names:
-			mode = self.get_mode(path.join(root, name))
+			mode = self.get_file(TargetFileInputSpec(path=Path(root.joinpath(name)))).mode
 			if not S_ISDIR(mode):
 				continue
-			found = self.find_root(path.join(root, name), maxdepth - 1)
+			found = self.find_root(root.joinpath(name), maxdepth - 1)
 			if found:
 				return found
 		return False
@@ -142,7 +139,7 @@ class SDK10Context(Context):
 context = SDK10Context
 argument_parser = SDK10ArgumentParser
 processors = {
-	"jinja": SDK10ProcessJinja2,
+	"jinja": SDK10Jinja2Process,
 }
 header = SDK10Header
 diff_context = 0

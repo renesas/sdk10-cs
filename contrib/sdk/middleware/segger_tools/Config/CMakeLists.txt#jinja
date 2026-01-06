@@ -1,6 +1,0 @@
-sdk10_include_directories(.)
-sdk10_sources(
-	{% if DA1459X %}
-	SEGGER_SYSVIEW_Config_FreeRTOS_da1459x.c
-	{% endif %}
-)

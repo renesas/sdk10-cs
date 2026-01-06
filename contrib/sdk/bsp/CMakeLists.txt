@@ -8,3 +8,7 @@ add_subdirectory(peripherals)
 add_subdirectory(startup)
 add_subdirectory(system)
 add_subdirectory(util)
+
+if(DEFINED DA1469X)
+	add_subdirectory(snc)
+endif()

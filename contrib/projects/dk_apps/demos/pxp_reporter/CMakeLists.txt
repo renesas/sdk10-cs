@@ -5,7 +5,7 @@ set(CONFIG_USE_BLE ON)
 set(SDK10_INCLUDE_DIRECTORIES config)
 set(SDK10_INCLUDE_FILES config/custom_config_eflash.h)
 
-find_package(SDK10 REQUIRED)
+find_package(SDK10 REQUIRED HINTS "$ENV{SDK10_ROOT}")
 
 project(pxp_reporter)
 

@@ -1,0 +1,6 @@
+!patchspec
+processors:
+  - # Fix invalid escape sequence </doc/kll.rst#sdk10cs-py-syntax>
+    id: exec
+    cmd: ruff check --silent --fix --select W605 -
+    input: !target

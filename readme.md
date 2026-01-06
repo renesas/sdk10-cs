@@ -37,6 +37,7 @@ The following functionality is not yet implemented or tested
 - DA1469X SDK10 support
 - DA1470X SDK10 support
 - Support `OS_BAREMETAL`
+- Remove ezFlashCLI dependency
 
 ## License
 

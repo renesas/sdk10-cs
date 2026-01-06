@@ -1,9 +1,10 @@
 sdk10_include_directories(.)
 sdk10_sources(
 	SEGGER_RTT.c
-	{% if DA1459X or DA1470X %}
-	SEGGER_RTT_ASM_ARMv7M.S
-	{% endif %}
 	SEGGER_RTT_printf.c
 	SEGGER_SYSVIEW.c
+)
+
+sdk10_sources_ifdef(DA1459X
+	SEGGER_RTT_ASM_ARMv7M.S
 )

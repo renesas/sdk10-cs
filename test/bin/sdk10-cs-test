@@ -1,0 +1,152 @@
+#!/bin/python3
+
+from argparse import ArgumentParser, ArgumentTypeError
+from pathlib import Path
+from typing import Any
+from yaml import safe_load
+from dataclasses import dataclass
+from subprocess import run, PIPE, STDOUT
+from os import environ
+import re
+
+def path_dir(path: str) -> Path:
+    out = Path(path)
+    if not out.is_dir():
+        raise ArgumentTypeError(f"not a directory: `{path}'")
+    return out
+
+@dataclass
+class Options:
+	sdk_dir: Path
+	build_dir: Path
+	cases: Path
+
+def parse_arguments() -> Options:
+    parser = ArgumentParser(
+        prog="sdk10-cs-test",
+        description="test sdk10-cs patched SDK projects",
+    )
+    parser.add_argument(
+        "--sdk-dir",
+        metavar="DIR",
+        help="SDK directory",
+        type=path_dir,
+    )
+    parser.add_argument(
+        "--build-dir",
+        metavar="DIR",
+        help="build directory",
+        type=Path,
+    )
+    parser.add_argument(
+        "cases",
+        metavar="CASES",
+        help="cases.yaml file",
+        type=Path,
+    )
+
+    options = parser.parse_args()
+    return Options(**vars(options))
+
+
+@dataclass
+class TestConfiguration:
+	path: Path
+	version: str
+	device: str
+
+def expand_configurations(config: dict[str, Any]) -> list[TestConfiguration]:
+	groups: dict[str, list[str]] = config.get("groups", {})
+	device_cfgs = config.get("configurations", [])
+
+	configurations = []
+
+	for test in config.get("tests", []):
+		path = test.get("path")
+		cfg_ids = []
+		for id in test.get("configurations", []):
+			if id in device_cfgs:
+				cfg_ids += [id]
+				continue
+			if id in groups:
+				cfg_ids += groups[id]
+				continue
+			# unknown id
+		for id in cfg_ids:
+			device_cfg = device_cfgs[id]
+			version = device_cfg.get("version")
+			for device in device_cfg.get("devices", []):
+				cfg = TestConfiguration(
+					path=Path(path),
+					device=device,
+					version=version,
+				)
+				configurations.append(cfg)
+	return configurations
+
+def make_slug(cfg: TestConfiguration) -> str:
+	slug = f"{str(cfg.path)}-{cfg.device}-{cfg.version}"
+	slug = re.sub(r"[^a-zA-Z0-9]", "_", slug)
+	slug = re.sub(r"_+", "_", slug)
+	return slug
+
+def run_test(options: Options, cfg: TestConfiguration) -> bool:
+	slug = make_slug(cfg)
+	sdk_dir = options.sdk_dir.joinpath(cfg.version)
+	source_dir = sdk_dir.joinpath(cfg.path)
+	build_dir = options.build_dir.joinpath(slug)
+	sdk10_cmake_dir = sdk_dir.joinpath("sdk/cmake")
+
+	env = environ
+	env["LANG"] = "C"
+	env["SDK10_ROOT"] = str(sdk10_cmake_dir)
+
+	log = ""
+
+	def finalize(result: bool, result_str: str):
+		if result == False:
+			# TODO: this fails if the directory wasn't created by cmake
+			build_dir.joinpath("build.log").write_text(log)
+
+		print(f"[{Path(*cfg.path.parts[2:])}] {cfg.device} SDK_{cfg.version}: {result_str}")
+
+		return result
+
+	cmd = run(
+		["cmake", "--log-level", "WARNING", "-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF", "-B", str(build_dir), "-S", str(source_dir)],
+		stdout=PIPE,
+		stderr=STDOUT,
+		text=True,
+		env=env,
+	)
+	log += cmd.stdout
+
+	if cmd.returncode != 0:
+		return finalize(False, "fail (configure)")
+
+	cmd = run(
+		["cmake", "--build", str(build_dir)],
+		stdout=PIPE,
+		stderr=STDOUT,
+		text=True,
+		env=env,
+	)
+	log += cmd.stdout
+
+	if cmd.returncode != 0:
+		return finalize(False, "fail (build)")
+
+	return finalize(True, "pass")
+
+def main():
+	options = parse_arguments()
+
+	configurations = expand_configurations(safe_load(options.cases.read_text()))
+
+	for cfg in configurations:
+		result = run_test(options, cfg)
+		if False and result == False:
+			break
+
+if __name__ == "__main__":
+	main()

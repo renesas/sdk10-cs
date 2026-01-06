@@ -1,0 +1,51 @@
+#!/bin/sh
+ARCHIVE_DIR="$1"
+OUTPUT_DIR="$2"
+
+progname="$(basename "$(readlink -f "$0")")"
+
+usage() {
+	echo "usage: $progname <ARCHIVE_DIR> <OUTPUT_DIR>" >&2
+}
+
+panic() {
+	echo "$progname: $*" >&2
+	usage
+	exit 1
+}
+
+[ -z "$ARCHIVE_DIR" ] && panic "no ARCHIVE_DIR provided"
+[ -z "$OUTPUT_DIR" ] && panic "no ARCHIVE_DIR provided"
+
+extract() {
+	sdk_version="$1"
+	archive_name="$ARCHIVE_DIR/$2"
+	subdir="$3"
+
+	if [ ! -e "$archive_name" ] ; then
+		echo "$archive_name does not exist, skipping..." >&2
+		return
+	fi
+
+	output="$OUTPUT_DIR/$sdk_version"
+	mkdir -p "$output"
+	depth="$(echo "$subdir" | tr -cd / | wc -c)"
+	bsdtar -C "$output" -xf "$archive_name" --strip-components "$depth" "$subdir"
+	chmod u+w,a+r -R "$output"
+}
+
+rm -rf "$OUTPUT_DIR"
+mkdir -p "$OUTPUT_DIR"
+
+extract 10.0.8.105     SDK_10.0.8.105.zip          SDK_10.0.8.105/
+extract 10.0.10.119.1  SDK_10.0.10.119.1.zip       SDK_10.0.10.119.1/
+extract 10.0.12.146    SDK_10.0.12.146.zip         SDK_10.0.12.146/
+extract 10.0.12.146.1  SDK_10.0.12.146.1.zip       SDK_10.0.12.146.1/
+extract 10.0.12.146.2  SDK_10.0.12.146.2.zip       SDK_10.0.12.146.2/
+extract 10.0.12.146.3  SDK_10.0.12.146.3.zip       SDK_10.0.12.146.3/
+extract 10.0.16.153    SDK_10.0.16.153.zip         SDK_10.0.16.153/
+extract 10.1.2.86      da1459x-sdk10.1.2.86.zip    SDK_10.1.2.86/
+extract 10.1.4.104     DA1459x_SDK_10.1.4.104.zip  DA1459x_SDK_10.1.4.104/SDK_10.1.4.104/
+extract 10.1.6.108     SDK_10.1.6.108.zip          SDK_10.1.6.108/
+extract 10.2.4.44      SDK-10.2.4.44.zip           SDK-10.2.4.44/
+extract 10.2.6.49      SDK-10.2.6.49.zip           SDK-10.2.6.49/
