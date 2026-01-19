@@ -8,9 +8,13 @@ macro(sdk10_def_option name default_value)
 		set(${name} ${default_value})
 	endif()
 endmacro()
+
 sdk10_def_option(DEVICE "$ENV{SDK10_DEVICE}")
 sdk10_def_option(TOOLCHAIN_HOME "$ENV{SDK10_TOOLCHAIN_HOME}")
 sdk10_def_option(CONFIG_USE_BLE NO)
+sdk10_def_option(SDK10_SECURE_KEYS product_keys.xml)
+sdk10_def_option(SDK10_SECURE_CONFIG secure_cfg.xml)
+sdk10_def_option(SDK10_SECURE_VERSION sw_version.h)
 
 # modules
 include(interface)
@@ -30,6 +34,8 @@ endif()
 set(KERNEL_NAME "sdk10")
 set(KERNEL_ELF_NAME "${KERNEL_NAME}.elf")
 set(KERNEL_BIN_NAME "${KERNEL_NAME}.bin")
+set(KERNEL_RAW_NAME "${KERNEL_NAME}.raw.bin")
+set(KERNEL_IMG_NAME "${KERNEL_NAME}.img")
 set(KERNEL_MAP_NAME "${KERNEL_NAME}.map")
 
 # create_nvparam.py

@@ -42,6 +42,10 @@ list(APPEND SDK10_NVPARAM_CONFIG_DIRS
 	"${CMAKE_CURRENT_LIST_DIR}/middleware/adapters/include"
 )
 
+cmake_path(ABSOLUTE_PATH SDK10_SECURE_KEYS BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+cmake_path(ABSOLUTE_PATH SDK10_SECURE_CONFIG BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+cmake_path(ABSOLUTE_PATH SDK10_SECURE_VERSION BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+
 # project
 project(SDK10 VERSION 10.1.6.108 LANGUAGES C ASM)
 
@@ -54,23 +58,6 @@ add_library(app)
 add_library(SDK10)
 add_executable("${KERNEL_NAME}" cmake/empty.c)
 
-# flash command
-add_custom_target(
-	flash
-	COMMAND ezFlashCLI image_flash "${KERNEL_BIN_NAME}"
-	DEPENDS "${KERNEL_BIN_NAME}"
-	USES_TERMINAL
-)
-
-# .elf -> .bin
-add_custom_command(
-	OUTPUT "${KERNEL_BIN_NAME}"
-	COMMAND "${CMAKE_OBJCOPY}" -O binary "${KERNEL_ELF_NAME}" "${KERNEL_BIN_NAME}"
-	DEPENDS "${KERNEL_NAME}"
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	VERBATIM
-)
-
 # print size after building
 add_custom_command(
 	TARGET "${KERNEL_NAME}"
@@ -81,11 +68,29 @@ add_custom_command(
 	VERBATIM
 )
 
-# create_nvparam
-add_custom_target(
-	nvparam
-	DEPENDS "${NVPARAM_BIN_NAME}"
+# regular .bin file
+add_custom_command(
+	OUTPUT "${KERNEL_BIN_NAME}"
+	COMMAND "${CMAKE_OBJCOPY}" -O binary "${KERNEL_ELF_NAME}" "${KERNEL_BIN_NAME}"
+	DEPENDS "${KERNEL_NAME}"
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	VERBATIM
 )
+
+# .raw.bin file
+add_custom_command(
+	OUTPUT "${KERNEL_RAW_NAME}"
+	COMMAND "${CMAKE_OBJCOPY}" -O binary --remove-section=.prod_head --remove-section=.prod_head_backup --remove-section=.img_head "${KERNEL_ELF_NAME}" "${KERNEL_RAW_NAME}"
+	DEPENDS "${KERNEL_NAME}"
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	VERBATIM
+)
+
+# create_nvparam
+add_custom_target(nvparam DEPENDS
+	"${NVPARAM_BIN_NAME}"
+)
+
 add_custom_command(
 	OUTPUT "${NVPARAM_BIN_NAME}"
 	COMMAND
@@ -95,6 +100,42 @@ add_custom_command(
 		${SDK10_NVPARAM_CONFIG_DIRS}
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	VERBATIM
+)
+
+add_custom_command(
+	OUTPUT "${KERNEL_IMG_NAME}"
+	COMMAND
+		python3 "${CMAKE_CURRENT_LIST_DIR}/../utilities/python_scripts/suota/v11/mkimage.py"
+		-q -p "${PRODUCT_ID}" --sw_version "${SDK10_SECURE_VERSION}"
+		-s "${SDK10_SECURE_CONFIG}" --prod_keys "${SDK10_SECURE_KEYS}"
+		"${KERNEL_RAW_NAME}" "${KERNEL_IMG_NAME}"
+	DEPENDS "${KERNEL_RAW_NAME}"
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	VERBATIM
+)
+
+set(FLASH_FILE "${KERNEL_BIN_NAME}")
+function(sdk10_secure_setup)
+	# all of these files need to exist in order to enable secure image generation
+	if (NOT EXISTS "${SDK10_SECURE_KEYS}")
+		return()
+	endif()
+	if (NOT EXISTS "${SDK10_SECURE_CONFIG}")
+		return()
+	endif()
+	if (NOT EXISTS "${SDK10_SECURE_VERSION}")
+		return()
+	endif()
+
+	set(FLASH_FILE "${KERNEL_IMG_NAME}" PARENT_SCOPE)
+endfunction()
+sdk10_secure_setup()
+
+add_custom_target(
+	flash
+	COMMAND ezFlashCLI image_flash "${FLASH_FILE}"
+	DEPENDS "${FLASH_FILE}"
+	USES_TERMINAL
 )
 
 # sdk sources
@@ -144,3 +185,6 @@ target_include_directories("${KERNEL_NAME}" PRIVATE "${include_directories}")
 
 sdk10_get_link_options(link_options)
 target_link_options("${KERNEL_NAME}" PRIVATE "${link_options}" "${compile_options}")
+
+# "default" target for post-processing stuff by default
+add_custom_target(default ALL DEPENDS "${FLASH_FILE}")

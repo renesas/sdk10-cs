@@ -1,0 +1,5 @@
+!patchspec
+processors:
+  - id: exec
+    cmd: [python3, !input mkimage_nonce.py]
+    input: !target

@@ -90,3 +90,15 @@ SDK10 specific variables can be set in the project CMakeLists.txt *before* impor
 ``SDK10_NVPARAM_CONFIG_DIR`` (path list)
   List of directories used to find ``app_nvparam.h`` and ``app_nvparam_values.h``.
   The default NVPARAM values will be used if this list is not provided.
+
+``SDK10_SECURE_KEYS`` (path)
+  Path to product keys XML file.
+  Set to ``product_keys.xml`` (inside source directory) by default.
+
+``SDK10_SECURE_CONFIG`` (path)
+  Path to security configuration XML file.
+  Set to ``secure_cfg.xml`` (inside source directory) by default.
+
+``SDK10_SECURE_VERSION`` (path)
+  Path to software version header file.
+  Set to ``sw_version.h`` (inside source directory) by default.

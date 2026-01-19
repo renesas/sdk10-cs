@@ -17,6 +17,8 @@ if("${DEVICE}" MATCHES "^DA1459[24]$")
 	sdk10_compile_definitions(dg_configDEVICE=${DEVICE}_00)
 	set(DA1459X TRUE)
 
+	set(PRODUCT_ID "DA1459x-00")
+
 	return()
 endif()
 
@@ -27,6 +29,8 @@ if("${DEVICE}" MATCHES "^DA1469[1579]$")
 
 	sdk10_compile_definitions(dg_configDEVICE=DA14699_00)
 	set(DA1469X TRUE)
+
+	set(PRODUCT_ID "DA1469x-00")
 
 	return()
 endif()

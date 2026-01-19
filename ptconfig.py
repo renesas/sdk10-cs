@@ -136,6 +136,9 @@ class SDK10Context(Context):
 				return found
 		return False
 
+	def get_apply_cmd(self):
+		return super().get_apply_cmd() + ['--whitespace', 'nowarn']
+
 context = SDK10Context
 argument_parser = SDK10ArgumentParser
 processors = {
