@@ -48,6 +48,7 @@ cmake_path(ABSOLUTE_PATH SDK10_SECURE_VERSION BASE_DIRECTORY "${CMAKE_SOURCE_DIR
 
 # project
 project(SDK10 VERSION 10.1.6.108 LANGUAGES C ASM)
+sdk10_def_option(SDK10_FLASH_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/program_qspi.xml")
 
 # file extensions
 list(APPEND CMAKE_ASM_SOURCE_FILE_EXTENSIONS "S")
@@ -91,10 +92,11 @@ add_custom_target(nvparam DEPENDS
 	"${NVPARAM_BIN_NAME}"
 )
 
+set(PYTHON_SCRIPTS_PATH "${CMAKE_CURRENT_LIST_DIR}/../utilities/python_scripts")
 add_custom_command(
 	OUTPUT "${NVPARAM_BIN_NAME}"
 	COMMAND
-		"${CMAKE_CURRENT_LIST_DIR}/../utilities/python_scripts/qspi/create_nvparam.py"
+		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/qspi/create_nvparam.py" --quiet
 		--arm_gcc_path "${TOOLCHAIN_HOME}/bin"
 		"${CMAKE_CURRENT_BINARY_DIR}"
 		${SDK10_NVPARAM_CONFIG_DIRS}
@@ -105,11 +107,26 @@ add_custom_command(
 add_custom_command(
 	OUTPUT "${KERNEL_IMG_NAME}"
 	COMMAND
-		python3 "${CMAKE_CURRENT_LIST_DIR}/../utilities/python_scripts/suota/v11/mkimage.py"
-		-q -p "${PRODUCT_ID}" --sw_version "${SDK10_SECURE_VERSION}"
-		-s "${SDK10_SECURE_CONFIG}" --prod_keys "${SDK10_SECURE_KEYS}"
+		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/suota/v11/mkimage.py" --quiet
+		--prod_id "${PRODUCT_ID}"
+		--sw_version "${SDK10_SECURE_VERSION}"
+		--sec_cfg "${SDK10_SECURE_CONFIG}"
+		--prod_keys "${SDK10_SECURE_KEYS}"
 		"${KERNEL_RAW_NAME}" "${KERNEL_IMG_NAME}"
 	DEPENDS "${KERNEL_RAW_NAME}"
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	VERBATIM
+)
+
+add_custom_command(
+	OUTPUT "${SDK10_FLASH_CONFIG}"
+	COMMAND
+		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/contrib/gen_flash_config.py"
+		"${PRODUCT_ID}"
+		"${DEVICE_FLASH_NAME}"
+		reflect.txt
+		"${SDK10_FLASH_CONFIG}"
+	DEPENDS reflect.txt
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	VERBATIM
 )
@@ -131,10 +148,22 @@ function(sdk10_secure_setup)
 endfunction()
 sdk10_secure_setup()
 
-add_custom_target(
-	flash
+add_custom_target(program_qspi
+	COMMAND
+		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/qspi/program_qspi.py" --quiet
+		--jlink
+		--header_config "${SDK10_FLASH_CONFIG}"
+		"${FLASH_FILE}"
+	DEPENDS "${FLASH_FILE}" "${SDK10_FLASH_CONFIG}"
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	USES_TERMINAL
+	VERBATIM
+)
+
+add_custom_target(flash
 	COMMAND ezFlashCLI image_flash "${FLASH_FILE}"
 	DEPENDS "${FLASH_FILE}"
+	VERBATIM
 	USES_TERMINAL
 )
 
@@ -152,10 +181,10 @@ foreach(script IN ITEMS mem sections)
 		OUTPUT "${script}.ld"
 		COMMAND
 			"${CMAKE_C_COMPILER}"
-				-E -P
-				${compiler_flags}
-				"${LDSCRIPT_PATH}/${script}.ld.h"
-				-o "${script}.ld"
+			-E -P
+			${compiler_flags}
+			"${LDSCRIPT_PATH}/${script}.ld.h"
+			-o "${script}.ld"
 		DEPENDS "${LDSCRIPT_PATH}/${script}.ld.h"
 		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
 		VERBATIM
@@ -164,6 +193,20 @@ foreach(script IN ITEMS mem sections)
 	add_dependencies(SDK10 "linker_script_${script}")
 	sdk10_link_options("-T${script}.ld")
 endforeach()
+
+# preprocessor reflection
+add_custom_command(
+	OUTPUT reflect.txt
+	COMMAND
+		"${CMAKE_C_COMPILER}"
+		-E -P
+		${compiler_flags}
+		"${CMAKE_CURRENT_LIST_DIR}/cmake/reflect.txt.h"
+		-o reflect.txt
+	DEPENDS "${CMAKE_CURRENT_LIST_DIR}/cmake/reflect.txt.h"
+	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+	VERBATIM
+)
 
 target_link_libraries(app PUBLIC SDK10)
 target_link_libraries("${KERNEL_NAME}" PUBLIC app)

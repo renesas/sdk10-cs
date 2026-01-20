@@ -126,3 +126,5 @@ elseif(LLVM)
 	find_program(CMAKE_STRIP        "llvm-strip"   ${FIND_ARGS})
 	find_program(CMAKE_SIZE         "llvm-size"    ${FIND_ARGS})
 endif()
+
+find_program(CMAKE_PYTHON3 "python3")

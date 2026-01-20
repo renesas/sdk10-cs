@@ -30,6 +30,8 @@ if("${DEVICE}" MATCHES "^DA1469[1579]$")
 	sdk10_compile_definitions(dg_configDEVICE=DA14699_00)
 	set(DA1469X TRUE)
 
+	# default devkit flash name
+	sdk10_def_option(DEVICE_FLASH_NAME "MX25U3235F")
 	set(PRODUCT_ID "DA1469x-00")
 
 	return()
