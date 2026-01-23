@@ -138,12 +138,12 @@ foreach(script IN ITEMS mem sections)
 			"${LDSCRIPT_PATH}/${script}.ld.h"
 			-o "${script}.ld"
 		DEPENDS "${LDSCRIPT_PATH}/${script}.ld.h"
-		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		VERBATIM
 	)
 	add_custom_target("linker_script_${script}" DEPENDS "${script}.ld")
 	add_dependencies(SDK10 "linker_script_${script}")
-	sdk10_link_options("-T${script}.ld")
+	sdk10_link_options("-T${CMAKE_CURRENT_BINARY_DIR}/${script}.ld")
 endforeach()
 
 # preprocessor reflection
@@ -184,6 +184,5 @@ target_link_options("${KERNEL_NAME}" PRIVATE "${link_options}" "${compile_option
 # "default" target for post-processing stuff by default
 add_custom_target(default ALL DEPENDS
 	"${KERNEL_BIN_NAME}"
-	"${KERNEL_RAW_NAME}"
 	"${FLASH_FILE}"
 )
