@@ -42,13 +42,8 @@ list(APPEND SDK10_NVPARAM_CONFIG_DIRS
 	"${CMAKE_CURRENT_LIST_DIR}/middleware/adapters/include"
 )
 
-cmake_path(ABSOLUTE_PATH SDK10_SECURE_KEYS BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
-cmake_path(ABSOLUTE_PATH SDK10_SECURE_CONFIG BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
-cmake_path(ABSOLUTE_PATH SDK10_SECURE_VERSION BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
-
 # project
 project(SDK10 VERSION 10.1.6.108 LANGUAGES C ASM)
-sdk10_def_option(SDK10_FLASH_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/program_qspi.xml")
 
 # file extensions
 list(APPEND CMAKE_ASM_SOURCE_FILE_EXTENSIONS "S")
@@ -92,7 +87,6 @@ add_custom_target(nvparam DEPENDS
 	"${NVPARAM_BIN_NAME}"
 )
 
-set(PYTHON_SCRIPTS_PATH "${CMAKE_CURRENT_LIST_DIR}/../utilities/python_scripts")
 add_custom_command(
 	OUTPUT "${NVPARAM_BIN_NAME}"
 	COMMAND
@@ -115,48 +109,6 @@ add_custom_command(
 		"${KERNEL_RAW_NAME}" "${KERNEL_IMG_NAME}"
 	DEPENDS "${KERNEL_RAW_NAME}"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	VERBATIM
-)
-
-add_custom_command(
-	OUTPUT "${SDK10_FLASH_CONFIG}"
-	COMMAND
-		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/contrib/gen_flash_config.py"
-		"${PRODUCT_ID}"
-		"${DEVICE_FLASH_NAME}"
-		reflect.txt
-		"${SDK10_FLASH_CONFIG}"
-	DEPENDS reflect.txt
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	VERBATIM
-)
-
-set(FLASH_FILE "${KERNEL_BIN_NAME}")
-function(sdk10_secure_setup)
-	# all of these files need to exist in order to enable secure image generation
-	if (NOT EXISTS "${SDK10_SECURE_KEYS}")
-		return()
-	endif()
-	if (NOT EXISTS "${SDK10_SECURE_CONFIG}")
-		return()
-	endif()
-	if (NOT EXISTS "${SDK10_SECURE_VERSION}")
-		return()
-	endif()
-
-	set(FLASH_FILE "${KERNEL_IMG_NAME}" PARENT_SCOPE)
-endfunction()
-sdk10_secure_setup()
-
-add_custom_target(program_qspi
-	COMMAND
-		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/qspi/program_qspi.py" --quiet
-		--jlink
-		--header_config "${SDK10_FLASH_CONFIG}"
-		"${FLASH_FILE}"
-	DEPENDS "${FLASH_FILE}" "${SDK10_FLASH_CONFIG}"
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	USES_TERMINAL
 	VERBATIM
 )
 
@@ -230,4 +182,8 @@ sdk10_get_link_options(link_options)
 target_link_options("${KERNEL_NAME}" PRIVATE "${link_options}" "${compile_options}")
 
 # "default" target for post-processing stuff by default
-add_custom_target(default ALL DEPENDS "${FLASH_FILE}")
+add_custom_target(default ALL DEPENDS
+	"${KERNEL_BIN_NAME}"
+	"${KERNEL_RAW_NAME}"
+	"${FLASH_FILE}"
+)

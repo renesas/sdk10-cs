@@ -102,3 +102,7 @@ SDK10 specific variables can be set in the project CMakeLists.txt *before* impor
 ``SDK10_SECURE_VERSION`` (path)
   Path to software version header file.
   Set to ``sw_version.h`` (inside source directory) by default.
+
+``SDK10_SECURITY`` (boolean)
+  Enable secure image generation.
+  Enabled by default if ``SDK10_SECURE_KEYS``, ``SDK10_SECURE_CONFIG`` and ``SDK10_SECURE_VERSION`` all point to existing files.
