@@ -98,14 +98,23 @@ add_custom_command(
 	VERBATIM
 )
 
+if (SDK10_IMAGE)
+	list(APPEND mkimage_args
+		--sw_version "${SDK10_SW_VERSION}"
+	)
+endif()
+if (SDK10_SECURITY)
+	list(APPEND mkimage_args
+		--sec_cfg "${SDK10_SECURE_CONFIG}"
+		--prod_keys "${SDK10_SECURE_KEYS}"
+	)
+endif()
 add_custom_command(
 	OUTPUT "${KERNEL_IMG_NAME}"
 	COMMAND
 		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/suota/v11/mkimage.py" --quiet
 		--prod_id "${PRODUCT_ID}"
-		--sw_version "${SDK10_SECURE_VERSION}"
-		--sec_cfg "${SDK10_SECURE_CONFIG}"
-		--prod_keys "${SDK10_SECURE_KEYS}"
+		${mkimage_args}
 		"${KERNEL_RAW_NAME}" "${KERNEL_IMG_NAME}"
 	DEPENDS "${KERNEL_RAW_NAME}"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"

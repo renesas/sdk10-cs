@@ -108,7 +108,8 @@ def run_test(options: Options, cfg: TestConfiguration) -> bool:
 			# TODO: this fails if the directory wasn't created by cmake
 			build_dir.joinpath("build.log").write_text(log)
 
-		print(f"[{Path(*cfg.path.parts[2:])}] {cfg.device} SDK_{cfg.version}: {result_str}")
+		tags = [str(Path(*cfg.path.parts[2:])), cfg.device, cfg.version]
+		print(",".join(tags) + "\t" + result_str)
 
 		return result
 
