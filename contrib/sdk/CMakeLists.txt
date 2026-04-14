@@ -122,8 +122,8 @@ add_custom_command(
 )
 
 add_custom_target(flash
-	COMMAND ezFlashCLI image_flash "${FLASH_FILE}"
-	DEPENDS "${FLASH_FILE}"
+	COMMAND ezFlashCLI image_flash "${KERNEL_BIN_NAME}"
+	DEPENDS "${KERNEL_BIN_NAME}"
 	VERBATIM
 	USES_TERMINAL
 )
@@ -156,18 +156,21 @@ foreach(script IN ITEMS mem sections)
 endforeach()
 
 # preprocessor reflection
-add_custom_command(
-	OUTPUT reflect.txt
+execute_process(
 	COMMAND
 		"${CMAKE_C_COMPILER}"
 		-E -P
 		${compiler_flags}
 		"${CMAKE_CURRENT_LIST_DIR}/cmake/reflect.txt.h"
 		-o reflect.txt
-	DEPENDS "${CMAKE_CURRENT_LIST_DIR}/cmake/reflect.txt.h"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	VERBATIM
 )
+execute_process(
+	COMMAND "${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/cmake/reflect-filter.py"
+	INPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/reflect.txt"
+	OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/reflect.cmake"
+)
+include("${CMAKE_CURRENT_BINARY_DIR}/reflect.cmake")
 
 target_link_libraries(app PUBLIC SDK10)
 target_link_libraries("${KERNEL_NAME}" PUBLIC app)
@@ -191,7 +194,4 @@ sdk10_get_link_options(link_options)
 target_link_options("${KERNEL_NAME}" PRIVATE "${link_options}" "${compile_options}")
 
 # "default" target for post-processing stuff by default
-add_custom_target(default ALL DEPENDS
-	"${KERNEL_BIN_NAME}"
-	"${FLASH_FILE}"
-)
+add_custom_target(default ALL DEPENDS "${KERNEL_BIN_NAME}")

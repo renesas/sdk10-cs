@@ -78,13 +78,6 @@ set(KERNEL_RAW_NAME "${KERNEL_NAME}.raw.bin")
 set(KERNEL_IMG_NAME "${KERNEL_NAME}.img")
 set(KERNEL_MAP_NAME "${KERNEL_NAME}.map")
 
-if (SDK10_IMAGE)
-	set(FLASH_FILE "${KERNEL_IMG_NAME}")
-else()
-	set(FLASH_FILE "${KERNEL_BIN_NAME}")
-endif()
-
-
 # create_nvparam.py
 set(NVPARAM_SYMBOLS_NAME "nvparam-symbols.o")
 set(NVPARAM_ELF_NAME "nvparam.elf")
