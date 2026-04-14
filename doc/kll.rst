@@ -72,3 +72,26 @@ SDK10CS-PY-SYNTAX
   String literals containing Windows-style paths incorrectly omit the raw string prefix in the released Python scripts.
 :Resolution:
   The syntax is corrected and no longer causes SyntaxWarnings.
+
+****************
+SDK10CS-PY-TKAPI
+****************
+
+:Version:
+  DA1459X (all versions)
+  DA1469X (all versions)
+:Symptoms:
+  Python scripts using GUI elements crash with a stack trace ending in::
+
+      File "/usr/lib/python3.14/tkinter/__init__.py", line 579, in __init__
+        Variable.__init__(self, master, value, name)
+        ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.14/tkinter/__init__.py", line 400, in __init__
+        self._root = master._root()
+                     ^^^^^^^^^^^^
+    AttributeError: 'str' object has no attribute '_root'
+
+:Root cause:
+  Incorrect tkinter API usage.
+:Resolution:
+  StringVar classes are initialized properly (naming the ``value`` parameter instead).

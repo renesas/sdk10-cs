@@ -1,0 +1,6 @@
+!patchspec
+processors:
+  - # Fix StringVar master error </doc/kll.rst#sdk10cs-py-tkapi>
+    id: exec
+    cmd: ["sed", "s/\\(\\<StringVar(\\)\\('')\\)/\\1value=\\2/g"]
+    input: !target
