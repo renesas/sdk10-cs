@@ -76,7 +76,13 @@ add_custom_command(
 # .raw.bin file
 add_custom_command(
 	OUTPUT "${KERNEL_RAW_NAME}"
-	COMMAND "${CMAKE_OBJCOPY}" -O binary --remove-section=.prod_head --remove-section=.prod_head_backup --remove-section=.img_head "${KERNEL_ELF_NAME}" "${KERNEL_RAW_NAME}"
+	COMMAND "${CMAKE_OBJCOPY}"
+		-O binary
+		--remove-section=.cs_and_keys
+		--remove-section=.prod_head
+		--remove-section=.prod_head_backup
+		--remove-section=.img_head
+		"${KERNEL_ELF_NAME}" "${KERNEL_RAW_NAME}"
 	DEPENDS "${KERNEL_NAME}"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	VERBATIM
@@ -194,4 +200,4 @@ sdk10_get_link_options(link_options)
 target_link_options("${KERNEL_NAME}" PRIVATE "${link_options}" "${compile_options}")
 
 # "default" target for post-processing stuff by default
-add_custom_target(default ALL DEPENDS "${KERNEL_BIN_NAME}")
+add_custom_target(default ALL DEPENDS "${KERNEL_BIN_NAME}" "${KERNEL_IMG_NAME}")
