@@ -23,7 +23,7 @@ sdk10_link_options(
 	-Xlinker --gc-sections
 	"-Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/${KERNEL_MAP_NAME}"
 )
-sdk10_link_options_ifdef(GCC
+sdk10_link_options_ifdef(GNU
 	--specs=nano.specs
 	--specs=nosys.specs
 )
@@ -127,13 +127,6 @@ add_custom_command(
 	VERBATIM
 )
 
-add_custom_target(flash
-	COMMAND ezFlashCLI image_flash "${KERNEL_BIN_NAME}"
-	DEPENDS "${KERNEL_BIN_NAME}"
-	VERBATIM
-	USES_TERMINAL
-)
-
 # sdk sources
 add_subdirectory(bsp)
 add_subdirectory(free_rtos)
@@ -177,6 +170,26 @@ execute_process(
 	OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/reflect.cmake"
 )
 include("${CMAKE_CURRENT_BINARY_DIR}/reflect.cmake")
+
+add_custom_target(flash
+	COMMAND ezFlashCLI image_flash "${KERNEL_BIN_NAME}"
+	DEPENDS "${KERNEL_BIN_NAME}"
+	VERBATIM
+	USES_TERMINAL
+)
+
+add_custom_target(flash_nvparam
+	COMMAND ezFlashCLI write_flash ${NVMS_PARAM_PART_START} "${NVPARAM_BIN_NAME}"
+	DEPENDS "${NVPARAM_BIN_NAME}"
+	VERBATIM
+	USES_TERMINAL
+)
+
+add_custom_target(erase
+	COMMAND ezFlashCLI erase_flash
+	VERBATIM
+	USES_TERMINAL
+)
 
 target_link_libraries(app PUBLIC SDK10)
 target_link_libraries("${KERNEL_NAME}" PUBLIC app)
