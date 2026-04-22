@@ -1,5 +1,4 @@
 import re
-from os import path
 from pathlib import Path
 from typing import cast
 from patchtree import Header, Context, Jinja2Process
@@ -7,6 +6,7 @@ from argparse import ArgumentParser
 from subprocess import run
 from stat import S_ISDIR
 
+from patchtree.fs import FileInputSpec
 from patchtree.target import TargetFileInputSpec
 
 PATCH_LICENSE = f"""
@@ -66,11 +66,46 @@ class SDK10ArgumentParser(ArgumentParser):
 		)
 
 class SDK10Jinja2Process(Jinja2Process):
+	@staticmethod
+	def format_config_headers(paths: list[str]):
+		if len(paths) == 0:
+			return ""
+		out = "set(SDK10_INCLUDE_FILES"
+
+		if len(paths) == 1:
+			out += " " + paths[0]
+		else:
+			out += "\n"
+			first = True
+			for path in paths:
+				out += "\t" + ("# " if not first else "") + path + "\n"
+				first = False
+
+		return f"{out})"
+
+	def find_config_headers(self):
+		base = cast(FileInputSpec, self.target_spec).path.parent
+		configs = [
+			"config/custom_config_eflash.h",
+			"config/custom_config_qspi.h",
+			"config/custom_config_oqspi.h",
+			"config/custom_config_ram.h",
+			"config/custom_config_snc.h",
+			"config/custom_config_eflash_suota.h",
+			"config/custom_config_qspi_suota.h",
+			"config/custom_config_oqspi_suota.h",
+			"config/custom_config_eflash_suota_asym.h",
+		]
+
+		configs = [config for config in configs if self.target.get_file(TargetFileInputSpec(base.joinpath(config))).mode != 0]
+		return self.format_config_headers(configs)
+
 	def get_template_vars(self):
 		context = cast(SDK10Context, self.target.context)
 		vars = {
 			"VERSION": context.sdk_version,
 			"TARGET": context.sdk_target,
+			"find_config_headers": self.find_config_headers,
 		}
 
 		TARGETS = ("DA1459X", "DA1469X", "DA1470X",)

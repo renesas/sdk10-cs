@@ -1,8 +1,12 @@
+--- !patchspec
+processors:
+  - id: jinja
+...
 cmake_minimum_required(VERSION 3.20.0)
 
 set(CONFIG_USE_BLE ON)
 set(SDK10_INCLUDE_DIRECTORIES config)
-set(SDK10_INCLUDE_FILES config/custom_config_eflash.h)
+{{ find_config_headers() }}
 
 find_package(SDK10 REQUIRED HINTS "$ENV{SDK10_ROOT}")
 
