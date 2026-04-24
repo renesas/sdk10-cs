@@ -7,6 +7,8 @@ from yaml import safe_load
 from dataclasses import dataclass
 from subprocess import run, PIPE, STDOUT
 from os import environ
+from math import log10
+from sys import stderr
 import re
 
 def path_dir(path: str) -> Path:
@@ -100,12 +102,13 @@ def run_test(options: Options, cfg: TestConfiguration) -> bool:
 	env = environ
 	env["LANG"] = "C"
 	env["SDK10_ROOT"] = str(sdk10_cmake_dir)
+	env["NO_COLOR"] = "y"
 
 	log = ""
 
 	def finalize(result: bool, result_str: str):
 		if result == False:
-			# TODO: this fails if the directory wasn't created by cmake
+			build_dir.mkdir(parents=True, exist_ok=True)
 			build_dir.joinpath("build.log").write_text(log)
 
 		tags = [str(Path(*cfg.path.parts[2:])), cfg.device, cfg.version]
@@ -114,7 +117,7 @@ def run_test(options: Options, cfg: TestConfiguration) -> bool:
 		return result
 
 	cmd = run(
-		["cmake", "--log-level", "WARNING", "-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF", "-B", str(build_dir), "-S", str(source_dir)],
+		["cmake", "--log-level", "WARNING", f"-DDEVICE={cfg.device}", "-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF", "-B", str(build_dir), "-S", str(source_dir)],
 		stdout=PIPE,
 		stderr=STDOUT,
 		text=True,
@@ -143,8 +146,11 @@ def main():
 	options = parse_arguments()
 
 	configurations = expand_configurations(safe_load(options.cases.read_text()))
+	total = len(configurations)
 
-	for cfg in configurations:
+	for i, cfg in enumerate(configurations):
+		print(f"\r[{str(i + 1).zfill(1 + int(log10(total)))}/{total}] ", end="", file=stderr)
+		stderr.flush()
 		result = run_test(options, cfg)
 		if False and result == False:
 			break

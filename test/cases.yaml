@@ -10,18 +10,25 @@ configurations:
     devices: [DA14592, DA14594]
   DA1469X_105:
     version: 10.0.8.105
+    devices: [DA14691, DA14695, DA14697, DA14699]
   DA1469X_119:
     version: 10.0.10.119.1
+    devices: [DA14691, DA14695, DA14697, DA14699]
   DA1469X_146_0:
     version: 10.0.12.146
+    devices: [DA14691, DA14695, DA14697, DA14699]
   DA1469X_146_1:
     version: 10.0.12.146.1
+    devices: [DA14691, DA14695, DA14697, DA14699]
   DA1469X_146_2:
     version: 10.0.12.146.2
+    devices: [DA14691, DA14695, DA14697, DA14699]
   DA1469X_146_3:
     version: 10.0.12.146.3
+    devices: [DA14691, DA14695, DA14697, DA14699]
   DA1469X_153:
     version: 10.0.16.153
+    devices: [DA14691, DA14695, DA14697, DA14699]
 
 groups:
   DA1459X:
