@@ -8,6 +8,9 @@ set(CONFIG_USE_BLE ON)
 set(SDK10_INCLUDE_DIRECTORIES config)
 {{ find_config_headers() }}
 
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+
 find_package(SDK10 REQUIRED HINTS "$ENV{SDK10_ROOT}")
 
 project(asymmetric_suota)

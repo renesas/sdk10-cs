@@ -1,0 +1,6 @@
+!patchspec
+processors:
+  - # `Reset_Handler' </doc/kll.rst#sdk10cs-text-reset>
+    id: exec
+    cmd: ["sed", "s/\\<text_reset\\>/\\0.100/"]
+    input: !target

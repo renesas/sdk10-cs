@@ -1,0 +1,6 @@
+!patchspec
+processors:
+  - # </doc/kll.rst#sdk10cs-text-reset>
+    id: exec
+    cmd: ["sed", "s/\\*(text_reset\\*)/*(SORT(text_reset*))/"]
+    input: !target

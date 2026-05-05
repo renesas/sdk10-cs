@@ -26,6 +26,7 @@ sdk10_link_options(
 sdk10_link_options_ifdef(GNU
 	--specs=nano.specs
 	--specs=nosys.specs
+	-Wl,--print-memory-usage
 )
 sdk10_include_files("${SDK10_INCLUDE_FILES}")
 foreach(dir IN LISTS SDK10_INCLUDE_DIRECTORIES)
@@ -33,6 +34,10 @@ foreach(dir IN LISTS SDK10_INCLUDE_DIRECTORIES)
 	sdk10_include_directories("${dir}")
 endforeach()
 sdk10_compile_definitions(dg_configBUILD_FOR_PROCESSOR=${BUILD_PROCESSOR})
+list(APPEND SDK10_RELEASE_CONFIGURATION_TYPES "Release" "RelWithDebInfo" "MinSizeRel")
+if (CMAKE_BUILD_TYPE IN_LIST SDK10_RELEASE_CONFIGURATION_TYPES)
+	sdk10_compile_definitions(RELEASE_BUILD)
+endif()
 
 foreach(dir IN LISTS SDK10_NVPARAM_CONFIG_DIR)
 	cmake_path(ABSOLUTE_PATH dir BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
@@ -53,16 +58,6 @@ set(CMAKE_EXECUTABLE_SUFFIX .elf)
 add_library(app)
 add_library(SDK10)
 add_executable("${KERNEL_NAME}" cmake/empty.c)
-
-# print size after building
-add_custom_command(
-	TARGET "${KERNEL_NAME}"
-	POST_BUILD
-	COMMAND "${CMAKE_SIZE}" "${KERNEL_NAME}${CMAKE_EXECUTABLE_SUFFIX}"
-	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	USES_TERMINAL
-	VERBATIM
-)
 
 # regular .bin file
 add_custom_command(
@@ -89,9 +84,7 @@ add_custom_command(
 )
 
 # create_nvparam
-add_custom_target(nvparam DEPENDS
-	"${NVPARAM_BIN_NAME}"
-)
+add_custom_target(nvparam DEPENDS "${NVPARAM_BIN_NAME}")
 
 add_custom_command(
 	OUTPUT "${NVPARAM_BIN_NAME}"
