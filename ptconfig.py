@@ -105,6 +105,7 @@ class SDK10Jinja2Process(Jinja2Process):
 		vars = {
 			"VERSION": context.sdk_version,
 			"TARGET": context.sdk_target,
+			"DEVICE_COMPAT": context.sdk_device_compat,
 			"find_config_headers": self.find_config_headers,
 		}
 
@@ -113,6 +114,11 @@ class SDK10Jinja2Process(Jinja2Process):
 			target = context.sdk_target.upper()
 			if target in TARGETS:
 				vars[target] = True
+
+		for key in list(vars.keys()):
+			if vars[key] is not None:
+				continue
+			del vars[key]
 		return vars
 
 class SDK10Context(Context):
@@ -123,6 +129,7 @@ class SDK10Context(Context):
 
 	sdk_version: int | None = None
 	sdk_target: str | None = None
+	sdk_device_compat: str | None = None
 
 	SDKROOT_SET = set(('doc', 'sdk', 'projects', 'utilities',))
 
@@ -145,12 +152,15 @@ class SDK10Context(Context):
 			self.sdk_version = int(match.group())
 
 		if options.sdk_target is not None:
-			context.sdk_target = options.sdk_target
+			self.sdk_target = options.sdk_target
 		if options.sdk_version is not None:
-			context.sdk_version = options.sdk_version
+			self.sdk_version = options.sdk_version
 
 		if self.sdk_version is None:
 			raise ValueError("no SDK version specified or detected")
+
+		if self.sdk_target is not None:
+			self.sdk_device_compat = "^" + self.sdk_target.upper().replace("X", ".") + "$"
 
 	def find_root(self, root: Path = Path(), maxdepth: int = 3) -> bool:
 		if maxdepth < 0:
