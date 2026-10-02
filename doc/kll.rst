@@ -95,3 +95,28 @@ SDK10CS-PY-TKAPI
   Incorrect tkinter API usage.
 :Resolution:
   StringVar classes are initialized properly (naming the ``value`` parameter instead).
+
+****************
+SDK10CS-PY-ENUMS
+****************
+
+:Version:
+  DA1459X (all versions)
+  DA1469X (all versions)
+:Symptoms:
+  Python scripts crash with a stack trace ending in::
+
+      File "/path/to/sdk/utilities/python_scripts/suota/v11/initial_flash.py", line 73, in initial_flash
+        cli = CliProgrammer(cfg_path=cfg, prod_id=prod_id)
+      File "/path/to/sdk/utilities/python_scripts/api/cli_programmer.py", line 114, in __init__
+        self.save(self.__temp_cfg)
+        ~~~~~~~~~^^^^^^^^^^^^^^^^^
+      File "/path/to/sdk/utilities/python_scripts/api/cli_programmer.py", line 138, in save
+        cmd.extend(['--prod-id', self.prod_id.value])
+                                 ^^^^^^^^^^^^^^^^^^
+    AttributeError: 'str' object has no attribute 'value'
+
+:Root cause:
+  Mixed use of Enum members and canonical enum values.
+:Resolution:
+  Canonical ProductId enum values are used instead of symbolic names / members.

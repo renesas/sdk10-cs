@@ -184,6 +184,16 @@ add_custom_target(erase
 	USES_TERMINAL
 )
 
+add_custom_target(initial_flash
+	COMMAND
+		"${CMAKE_PYTHON3}" "${PYTHON_SCRIPTS_PATH}/suota/v11/initial_flash.py" --quiet
+		--prod_id "${PRODUCT_ID}"
+		"${KERNEL_BIN_NAME}"
+	DEPENDS "${KERNEL_BIN_NAME}"
+	VERBATIM
+	USES_TERMINAL
+)
+
 target_link_libraries(app PUBLIC SDK10)
 target_link_libraries("${KERNEL_NAME}" PUBLIC app)
 

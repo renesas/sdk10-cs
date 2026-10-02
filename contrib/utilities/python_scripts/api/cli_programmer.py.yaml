@@ -1,0 +1,6 @@
+!patchspec
+processors:
+  - # </doc/kll.rst#sdk10cs-py-enums>
+    id: exec
+    cmd: ["sed", "s/\\(\\<self\\.prod_id\\)\\.value/\\1/g"]
+    input: !target

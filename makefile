@@ -7,7 +7,7 @@ all: build/SDK_10.0.12.146.2.patch
 all: build/SDK_10.0.12.146.3.patch
 all: build/SDK_10.0.12.146.patch
 all: build/SDK_10.0.16.153.patch
-# all: build/SDK_10.0.8.105.patch
+all: build/SDK_10.0.8.105.patch
 
 %.patch: %.zip
 	sha1sum --quiet --check $<.sha1
